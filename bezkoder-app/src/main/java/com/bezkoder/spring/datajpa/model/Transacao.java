@@ -10,27 +10,27 @@ public class Transacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idTransacao")
+    @Column(name = "id_transacao")
     private Long idTransacao;
 
-    @Column(name = "codInvestimento")
+    @Column(name = "cod_investimento")
     private Long codInvestimento;
 
     @ManyToOne
-    @JoinColumn(name = "codInvestimento", insertable = false, updatable = false)
+    @JoinColumn(name = "cod_investimento", insertable = false, updatable = false)
     private TipoInvestimento investimento;
 
-    @Column(name = "idUsuario")
+    @Column(name = "id_usuario")
     private Long idUsuario;
 
     @ManyToOne
-    @JoinColumn(name = "idUsuario", insertable = false, updatable = false)
+    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     private Usuario usuario;
 
-    @Column(name = "data")
-    private LocalDateTime data;
+    @Column(name = "data_transacao")
+    private LocalDateTime dataTransacao;
 
-    @Column(name = "dataVencimento")
+    @Column(name = "data_vencimento")
     private LocalDateTime dataVencimento;
 
     @Column(name = "instituicao", length = 200)
@@ -41,6 +41,50 @@ public class Transacao {
 
     @Column(name = "quantidade")
     private BigDecimal quantidade;
+
+    public Transacao() {
+
+    }
+
+    public Long getIdTransacao(){
+        return this.idTransacao;
+    }
+
+    public void setIdTransacao(Long idTransacao){
+        this.idTransacao = idTransacao;
+    }
+
+    public Long getCodInvestimento(){
+        return this.codInvestimento;
+    }
+
+    public void setCodInvestimento(Long codInvestimento){
+        this.codInvestimento = codInvestimento;
+    }
+
+    public Long getIdUsuario(){
+        return this.idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario){
+        this.idUsuario = idUsuario;
+    }
+
+    public LocalDateTime getDataTransacao(){
+        return this.dataTransacao;
+    }
+
+    public void setDataTransacao(LocalDateTime dataTransacao){
+        this.dataTransacao = dataTransacao;
+    }
+
+    public LocalDateTime getDataVencimento(){
+        return this.dataVencimento;
+    }
+
+    public void setDataVencimento(LocalDateTime dataVencimento){
+        this.dataVencimento = dataVencimento;
+    }
 
     // Getters e Setters
 }
