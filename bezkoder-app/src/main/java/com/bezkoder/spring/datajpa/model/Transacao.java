@@ -1,8 +1,16 @@
 package com.bezkoder.spring.datajpa.model;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "Transacao")
@@ -42,49 +50,101 @@ public class Transacao {
     @Column(name = "quantidade")
     private BigDecimal quantidade;
 
+    public Transacao(Long codInvestimento, LocalDateTime dataTransacao, LocalDateTime dataVencimento, Long idTransacao, Long idUsuario, String instituicao, TipoInvestimento investimento, BigDecimal quantidade, Usuario usuario, BigDecimal valor) {
+        this.codInvestimento = codInvestimento;
+        this.dataTransacao = dataTransacao;
+        this.dataVencimento = dataVencimento;
+        this.idTransacao = idTransacao;
+        this.idUsuario = idUsuario;
+        this.instituicao = instituicao;
+        this.investimento = investimento;
+        this.quantidade = quantidade;
+        this.usuario = usuario;
+        this.valor = valor;
+    }
+
     public Transacao() {
-
     }
 
-    public Long getIdTransacao(){
-        return this.idTransacao;
+    public Long getIdTransacao() {
+        return idTransacao;
     }
 
-    public void setIdTransacao(Long idTransacao){
+    public void setIdTransacao(Long idTransacao) {
         this.idTransacao = idTransacao;
     }
 
-    public Long getCodInvestimento(){
-        return this.codInvestimento;
+    public Long getCodInvestimento() {
+        return codInvestimento;
     }
 
-    public void setCodInvestimento(Long codInvestimento){
+    public void setCodInvestimento(Long codInvestimento) {
         this.codInvestimento = codInvestimento;
     }
 
-    public Long getIdUsuario(){
-        return this.idUsuario;
+    public TipoInvestimento getInvestimento() {
+        return investimento;
     }
 
-    public void setIdUsuario(Long idUsuario){
+    public void setInvestimento(TipoInvestimento investimento) {
+        this.investimento = investimento;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
         this.idUsuario = idUsuario;
     }
 
-    public LocalDateTime getDataTransacao(){
-        return this.dataTransacao;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setDataTransacao(LocalDateTime dataTransacao){
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public LocalDateTime getDataTransacao() {
+        return dataTransacao;
+    }
+
+    public void setDataTransacao(LocalDateTime dataTransacao) {
         this.dataTransacao = dataTransacao;
     }
 
-    public LocalDateTime getDataVencimento(){
-        return this.dataVencimento;
+    public LocalDateTime getDataVencimento() {
+        return dataVencimento;
     }
 
-    public void setDataVencimento(LocalDateTime dataVencimento){
+    public void setDataVencimento(LocalDateTime dataVencimento) {
         this.dataVencimento = dataVencimento;
     }
 
-    // Getters e Setters
+    public String getInstituicao() {
+        return instituicao;
+    }
+
+    public void setInstituicao(String instituicao) {
+        this.instituicao = instituicao;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
+    }
+
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
+
+    public BigDecimal getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(BigDecimal quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    
 }

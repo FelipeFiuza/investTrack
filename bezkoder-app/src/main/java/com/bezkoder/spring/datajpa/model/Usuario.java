@@ -1,6 +1,11 @@
 package com.bezkoder.spring.datajpa.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "usuario")
@@ -21,9 +26,10 @@ public class Usuario {
 
     }
 
-    public Usuario(String token, String nome) {
-        this.token = token;
+    public Usuario(Long idUsuario, String nome, String token) {
+        this.idUsuario = idUsuario;
         this.nome = nome;
+        this.token = token;
     }
 
     public Long getIdUsuario(){
@@ -49,7 +55,5 @@ public class Usuario {
     public void setNome(String nome){
         this.nome = nome;
     }
-
-
-    // Getters e Setters
+    
 }

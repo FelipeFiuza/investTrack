@@ -1,37 +1,112 @@
 package com.bezkoder.spring.datajpa.model;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 @Entity
 @IdClass(ApuracaoIndiceId.class)
-@Table(name = "ApuracaoIndice")
+@Table(name = "apuracao_indice")
 public class ApuracaoIndice {
 
     @Id
-    @Column(name = "codIndice", length = 20)
+    @Column(name = "cod_indice", length = 20)
     private String codIndice;
 
     @Id
-    @Column(name = "dataApuracao")
+    @Column(name = "data_apuracao")
     private LocalDateTime dataApuracao;
 
     @ManyToOne
-    @JoinColumn(name = "codIndice", insertable = false, updatable = false)
+    @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
     private Indice indice;
 
-    @Column(name = "valorAbertura")
+    @Column(name = "valor_abertura")
     private BigDecimal valorAbertura;
 
-    @Column(name = "valorMaximo")
+    @Column(name = "valor_maximo")
     private BigDecimal valorMaximo;
 
-    @Column(name = "valorMinimo")
+    @Column(name = "valor_minimo")
     private BigDecimal valorMinimo;
 
-    @Column(name = "valorFechamento")
+    @Column(name = "valor_fechamento")
     private BigDecimal valorFechamento;
 
-    // Getters e Setters
+    public ApuracaoIndice() {
+    }
+
+    public ApuracaoIndice(String codIndice, LocalDateTime dataApuracao, Indice indice, BigDecimal valorAbertura, BigDecimal valorFechamento, BigDecimal valorMaximo, BigDecimal valorMinimo) {
+        this.codIndice = codIndice;
+        this.dataApuracao = dataApuracao;
+        this.indice = indice;
+        this.valorAbertura = valorAbertura;
+        this.valorFechamento = valorFechamento;
+        this.valorMaximo = valorMaximo;
+        this.valorMinimo = valorMinimo;
+    }
+
+    public String getCodIndice() {
+        return codIndice;
+    }
+
+    public void setCodIndice(String codIndice) {
+        this.codIndice = codIndice;
+    }
+
+    public LocalDateTime getDataApuracao() {
+        return dataApuracao;
+    }
+
+    public void setDataApuracao(LocalDateTime dataApuracao) {
+        this.dataApuracao = dataApuracao;
+    }
+
+    public Indice getIndice() {
+        return indice;
+    }
+
+    public void setIndice(Indice indice) {
+        this.indice = indice;
+    }
+
+    public BigDecimal getValorAbertura() {
+        return valorAbertura;
+    }
+
+    public void setValorAbertura(BigDecimal valorAbertura) {
+        this.valorAbertura = valorAbertura;
+    }
+
+    public BigDecimal getValorMaximo() {
+        return valorMaximo;
+    }
+
+    public void setValorMaximo(BigDecimal valorMaximo) {
+        this.valorMaximo = valorMaximo;
+    }
+
+    public BigDecimal getValorMinimo() {
+        return valorMinimo;
+    }
+
+    public void setValorMinimo(BigDecimal valorMinimo) {
+        this.valorMinimo = valorMinimo;
+    }
+
+    public BigDecimal getValorFechamento() {
+        return valorFechamento;
+    }
+
+    public void setValorFechamento(BigDecimal valorFechamento) {
+        this.valorFechamento = valorFechamento;
+    }
+
 }
