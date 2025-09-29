@@ -1,0 +1,42 @@
+    1  apt-get
+    2  apt install git
+    3  sudo apt install git
+    4  sudo apt install docker
+    5  snap install docker
+    6  sudo snap install docker
+    7  exit
+    8  cd #
+    9  ls
+   10  cd ..
+   11  ls
+   12  sudo apt-get update
+   13  sudo apt-get install ca-certificates curl
+   14  sudo install -m 0755 -d /etc/apt/keyrings
+   15  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+   16  sudo chmod a+r /etc/apt/keyrings/docker.asc
+   17  echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   18  sudo apt-get update
+   19  history
+   20  ls #
+   21  cd #
+   22  git clone https://github.com/FelipeFiuza/investTrack.git
+   23  docker compose up
+   24  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   25  sudo systemctl status docker
+   26  docker run hello-world
+   27  sudo docker run hello-world
+   28  docker compose up
+   29  ls
+   30  cd investTrack/
+   31  docker compose up
+   32  sudo docker compose up
+   33  ls
+   34  history
+   35  history > history.txt
+
+   83  sudo docker compose build
+   84  sudo docker compose up -d
+   
+
+   https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
