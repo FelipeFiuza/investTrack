@@ -2,6 +2,8 @@ package com.bezkoder.spring.datajpa.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -12,11 +14,9 @@ import javax.persistence.Table;
 public class TipoInvestimento {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "cod_investimento")
     private Long codInvestimento;
-
-    @Column(name = "cod_indice", length = 20)
-    private String codIndice;
 
     @ManyToOne
     @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
@@ -35,7 +35,6 @@ public class TipoInvestimento {
     }
 
     public TipoInvestimento(String codIndice, Long codInvestimento, String descricao, String incideIof, String incideIr, Indice indice) {
-        this.codIndice = codIndice;
         this.codInvestimento = codInvestimento;
         this.descricao = descricao;
         this.incideIof = incideIof;
@@ -49,14 +48,6 @@ public class TipoInvestimento {
 
     public void setCodInvestimento(Long codInvestimento) {
         this.codInvestimento = codInvestimento;
-    }
-
-    public String getCodIndice() {
-        return codIndice;
-    }
-
-    public void setCodIndice(String codIndice) {
-        this.codIndice = codIndice;
     }
 
     public Indice getIndice() {

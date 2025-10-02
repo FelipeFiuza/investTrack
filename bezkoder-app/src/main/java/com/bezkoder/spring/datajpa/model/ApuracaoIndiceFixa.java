@@ -17,13 +17,10 @@ import javax.persistence.Table;
 public class ApuracaoIndiceFixa {
 
     @Id
-    @Column(name = "cod_indice", length = 20)
-    private String codIndice;
-
-    @Id
     @Column(name = "data_apuracao")
     private LocalDateTime dataApuracao;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
     private Indice indice;
@@ -35,18 +32,9 @@ public class ApuracaoIndiceFixa {
     }
 
     public ApuracaoIndiceFixa(String codIndice, LocalDateTime dataApuracao, Indice indice, BigDecimal valorFechamento) {
-        this.codIndice = codIndice;
         this.dataApuracao = dataApuracao;
         this.indice = indice;
         this.valorFechamento = valorFechamento;
-    }
-
-    public String getCodIndice() {
-        return codIndice;
-    }
-
-    public void setCodIndice(String codIndice) {
-        this.codIndice = codIndice;
     }
 
     public LocalDateTime getDataApuracao() {

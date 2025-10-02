@@ -285,6 +285,119 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "TiposInvestimento",
+			"item": [
+				{
+					"name": "getTiposInvestimento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:6868/api/tipos-investimento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "6868",
+							"path": [
+								"api",
+								"tipos-investimento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postTiposInvestimento",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"codTiposInvestimento\": \"B3-WEGE3\",\r\n    \"descricao\": \"Ação WEG\",\r\n    \"periodicidade\": \"D\",\r\n    \"tipoIndice\": \"A\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:6868/api/tipos-investimento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "6868",
+							"path": [
+								"api",
+								"tipos-investimento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postTiposInvestimento Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"codTiposInvestimento\": \"Cetip-CDI\",\r\n    \"descricao\": \"Taxa de Juros - CDI\",\r\n    \"periodicidade\": \"D\",\r\n    \"tipoIndice\": \"F\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:6868/api/tipos-investimento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "6868",
+							"path": [
+								"api",
+								"tipos-investimento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "putTiposInvestimento",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"codTiposInvestimento\": \"B3-WEGE3\",\r\n    \"descricao\": \"Ação WEG LTDA\",\r\n    \"periodicidade\": \"D\",\r\n    \"tipoIndice\": \"A\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:6868/api/tipos-investimento/B3-WEGE3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "6868",
+							"path": [
+								"api",
+								"tipos-investimento",
+								"B3-WEGE3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

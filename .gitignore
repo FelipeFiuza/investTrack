@@ -1,2 +1,5 @@
 # pasta m2
 .m2/
+
+#pasta target
+bezkoder-app/target/

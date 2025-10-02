@@ -21,15 +21,9 @@ public class Transacao {
     @Column(name = "id_transacao")
     private Long idTransacao;
 
-    @Column(name = "cod_investimento")
-    private Long codInvestimento;
-
     @ManyToOne
     @JoinColumn(name = "cod_investimento", insertable = false, updatable = false)
     private TipoInvestimento investimento;
-
-    @Column(name = "id_usuario")
-    private Long idUsuario;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
@@ -51,11 +45,9 @@ public class Transacao {
     private BigDecimal quantidade;
 
     public Transacao(Long codInvestimento, LocalDateTime dataTransacao, LocalDateTime dataVencimento, Long idTransacao, Long idUsuario, String instituicao, TipoInvestimento investimento, BigDecimal quantidade, Usuario usuario, BigDecimal valor) {
-        this.codInvestimento = codInvestimento;
         this.dataTransacao = dataTransacao;
         this.dataVencimento = dataVencimento;
         this.idTransacao = idTransacao;
-        this.idUsuario = idUsuario;
         this.instituicao = instituicao;
         this.investimento = investimento;
         this.quantidade = quantidade;
@@ -74,28 +66,12 @@ public class Transacao {
         this.idTransacao = idTransacao;
     }
 
-    public Long getCodInvestimento() {
-        return codInvestimento;
-    }
-
-    public void setCodInvestimento(Long codInvestimento) {
-        this.codInvestimento = codInvestimento;
-    }
-
     public TipoInvestimento getInvestimento() {
         return investimento;
     }
 
     public void setInvestimento(TipoInvestimento investimento) {
         this.investimento = investimento;
-    }
-
-    public Long getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
     }
 
     public Usuario getUsuario() {
@@ -146,5 +122,4 @@ public class Transacao {
         this.quantidade = quantidade;
     }
 
-    
 }
