@@ -1,6 +1,5 @@
 package com.bezkoder.spring.datajpa.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.bezkoder.spring.datajpa.model.Usuario;
-import com.bezkoder.spring.datajpa.repository.UsuarioRepository;
+import com.bezkoder.spring.datajpa.dto.UsuarioCreateDTO;
+import com.bezkoder.spring.datajpa.dto.UsuarioDTO;
+import com.bezkoder.spring.datajpa.dto.UsuarioUpdateDTO;
+import com.bezkoder.spring.datajpa.service.UsuarioService;
 
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
@@ -18,17 +19,12 @@ import com.bezkoder.spring.datajpa.repository.UsuarioRepository;
 public class UsuarioController {
 
     @Autowired
-    UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
     @GetMapping
-    public ResponseEntity<List<Usuario>> getAll(@RequestParam(required = false) String nome) {
+    public ResponseEntity<List<UsuarioDTO>> getAll(@RequestParam(required = false) String nome) {
         try {
-            List<Usuario> usuarios = new ArrayList<>();
-
-            if (nome == null)
-                usuarioRepository.findAll().forEach(usuarios::add);
-            else
-                usuarioRepository.findByNomeContaining(nome).forEach(usuarios::add);
+            List<UsuarioDTO> usuarios = usuarioService.getAllUsuarios(nome);
 
             if (usuarios.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -36,37 +32,34 @@ public class UsuarioController {
             return new ResponseEntity<>(usuarios, HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getById(@PathVariable("id") Long id) {
-        Optional<Usuario> usuarioData = usuarioRepository.findById(id);
+    public ResponseEntity<UsuarioDTO> getById(@PathVariable("id") Long id) {
+        Optional<UsuarioDTO> usuarioData = usuarioService.getUsuarioById(id);
 
         return usuarioData.map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK))
                           .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> create(@RequestBody Usuario usuario) {
+    public ResponseEntity<UsuarioDTO> create(@RequestBody UsuarioCreateDTO usuarioCreateDTO) {
         try {
-            Usuario _usuario = usuarioRepository.save(usuario);
-            return new ResponseEntity<>(_usuario, HttpStatus.CREATED);
+            UsuarioDTO usuario = usuarioService.createUsuario(usuarioCreateDTO);
+            return new ResponseEntity<>(usuario, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> update(@PathVariable("id") Long id, @RequestBody Usuario usuario) {
-        Optional<Usuario> usuarioData = usuarioRepository.findById(id);
+    public ResponseEntity<UsuarioDTO> update(@PathVariable("id") Long id, @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+        Optional<UsuarioDTO> usuarioData = usuarioService.updateUsuario(id, usuarioUpdateDTO);
 
         if (usuarioData.isPresent()) {
-            Usuario _usuario = usuarioData.get();
-            _usuario.setNome(usuario.getNome());
-            _usuario.setToken(usuario.getToken());
-            return new ResponseEntity<>(usuarioRepository.save(_usuario), HttpStatus.OK);
+            return new ResponseEntity<>(usuarioData.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -75,8 +68,11 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") Long id) {
         try {
-            usuarioRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            if (usuarioService.deleteUsuario(id)) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -85,10 +81,21 @@ public class UsuarioController {
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteAll() {
         try {
-            usuarioRepository.deleteAll();
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            if (usuarioService.deleteAllUsuarios()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/token/{token}")
+    public ResponseEntity<UsuarioDTO> getByToken(@PathVariable("token") String token) {
+        Optional<UsuarioDTO> usuarioData = usuarioService.getUsuarioByToken(token);
+
+        return usuarioData.map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK))
+                          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

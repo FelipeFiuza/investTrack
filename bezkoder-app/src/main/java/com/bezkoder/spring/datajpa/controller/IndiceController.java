@@ -7,19 +7,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.bezkoder.spring.datajpa.model.Indice;
-import com.bezkoder.spring.datajpa.repository.IndiceRepository;
+import com.bezkoder.spring.datajpa.dto.IndiceCreateDTO;
+import com.bezkoder.spring.datajpa.dto.IndiceDTO;
+import com.bezkoder.spring.datajpa.dto.IndiceUpdateDTO;
+import com.bezkoder.spring.datajpa.service.IndiceService;
 
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
@@ -27,17 +20,23 @@ import com.bezkoder.spring.datajpa.repository.IndiceRepository;
 public class IndiceController {
 
     @Autowired
-    IndiceRepository indiceRepository;
+    private IndiceService indiceService;
 
     @GetMapping
-    public ResponseEntity<List<Indice>> getAll(@RequestParam(required = false) String descricao) {
+    public ResponseEntity<List<IndiceDTO>> getAll(
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) String tipoIndice) {
         try {
-            List<Indice> indices = new ArrayList<>();
 
-            if (descricao == null)
-                indiceRepository.findAll().forEach(indices::add);
-            else
-                indiceRepository.findByDescricaoContaining(descricao).forEach(indices::add);
+            List<IndiceDTO> indices = new ArrayList<>();
+
+            if(descricao != null && !descricao.isEmpty()) {
+                indices = indiceService.getIndicesByDescricao(descricao);
+            } else if(tipoIndice != null && !tipoIndice.isEmpty()) {
+                indices = indiceService.getIndicesByTipoIndice(tipoIndice);
+            } else {
+                indices = indiceService.getAllIndices(descricao, tipoIndice);
+            }
 
             if (indices.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -45,48 +44,48 @@ public class IndiceController {
             return new ResponseEntity<>(indices, HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{codIndice}")
-    public ResponseEntity<Indice> getById(@PathVariable("codIndice") String codIndice) {
-        Optional<Indice> indiceData = indiceRepository.findById(codIndice);
+    public ResponseEntity<IndiceDTO> getById(@PathVariable("codIndice") Long codIndice) {
+        Optional<IndiceDTO> indiceData = indiceService.getIndiceById(codIndice);
 
         return indiceData.map(indice -> new ResponseEntity<>(indice, HttpStatus.OK))
-                         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<Indice> create(@RequestBody Indice indice) {
+    public ResponseEntity<IndiceDTO> create(@RequestBody IndiceCreateDTO indiceCreateDTO) {
         try {
-            Indice _indice = indiceRepository.save(indice);
-            return new ResponseEntity<>(_indice, HttpStatus.CREATED);
+            IndiceDTO indice = indiceService.createIndice(indiceCreateDTO);
+            return new ResponseEntity<>(indice, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{codIndice}")
-    public ResponseEntity<Indice> update(@PathVariable("codIndice") String codIndice, @RequestBody Indice indice) {
-        Optional<Indice> indiceData = indiceRepository.findById(codIndice);
+    public ResponseEntity<IndiceDTO> update(@PathVariable("codIndice") Long codIndice, 
+                                           @RequestBody IndiceUpdateDTO indiceUpdateDTO) {
+        Optional<IndiceDTO> indiceData = indiceService.updateIndice(codIndice, indiceUpdateDTO);
 
         if (indiceData.isPresent()) {
-            Indice _indice = indiceData.get();
-            _indice.setDescricao(indice.getDescricao());
-            _indice.setPeriodicidade(indice.getPeriodicidade());
-            _indice.setTipoIndice(indice.getTipoIndice());
-            return new ResponseEntity<>(indiceRepository.save(_indice), HttpStatus.OK);
+            return new ResponseEntity<>(indiceData.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{codIndice}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("codIndice") String codIndice) {
+    public ResponseEntity<HttpStatus> delete(@PathVariable("codIndice") Long codIndice) {
         try {
-            indiceRepository.deleteById(codIndice);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            if (indiceService.deleteIndice(codIndice)) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -95,10 +94,14 @@ public class IndiceController {
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteAll() {
         try {
-            indiceRepository.deleteAll();
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            if (indiceService.deleteAllIndices()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
