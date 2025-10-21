@@ -5,13 +5,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class ApuracaoIndiceId implements Serializable {
-    private Indice indice;
+    private Long codIndice;
     private LocalDateTime dataApuracao;
 
     public ApuracaoIndiceId() {}
 
-    public ApuracaoIndiceId(Indice indice, LocalDateTime dataApuracao) {
-        this.indice = indice;
+    public ApuracaoIndiceId(Long codIndice, LocalDateTime dataApuracao) {
+        this.codIndice = codIndice;
         this.dataApuracao = dataApuracao;
     }
 
@@ -20,7 +20,7 @@ public class ApuracaoIndiceId implements Serializable {
         if (this == o) return true;
         if (!(o instanceof ApuracaoIndiceId)) return false;
         ApuracaoIndiceId that = (ApuracaoIndiceId) o;
-        return Objects.equals(indice, that.indice) &&
+        return Objects.equals(codIndice, that.codIndice) &&
                Objects.equals(dataApuracao, that.dataApuracao);
     }
 

@@ -21,6 +21,9 @@ public class ApuracaoIndice {
     private LocalDateTime dataApuracao;
 
     @Id
+    @Column(name = "cod_indice")
+    private Long codIndice;
+
     @ManyToOne
     @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
     private Indice indice;
@@ -40,9 +43,10 @@ public class ApuracaoIndice {
     public ApuracaoIndice() {
     }
 
-    public ApuracaoIndice(String codIndice, LocalDateTime dataApuracao, Indice indice, BigDecimal valorAbertura, BigDecimal valorFechamento, BigDecimal valorMaximo, BigDecimal valorMinimo) {
+    public ApuracaoIndice(LocalDateTime dataApuracao, Indice indice, BigDecimal valorAbertura, BigDecimal valorFechamento, BigDecimal valorMaximo, BigDecimal valorMinimo) {
         this.dataApuracao = dataApuracao;
         this.indice = indice;
+        this.codIndice = indice.getCodIndice();
         this.valorAbertura = valorAbertura;
         this.valorFechamento = valorFechamento;
         this.valorMaximo = valorMaximo;
@@ -57,12 +61,17 @@ public class ApuracaoIndice {
         this.dataApuracao = dataApuracao;
     }
 
+    public Long getCodIndice() {
+        return codIndice;
+    }
+
     public Indice getIndice() {
         return indice;
     }
 
     public void setIndice(Indice indice) {
         this.indice = indice;
+        this.codIndice = indice.getCodIndice();
     }
 
     public BigDecimal getValorAbertura() {

@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -18,7 +18,10 @@ public class TipoInvestimento {
     @Column(name = "cod_investimento")
     private Long codInvestimento;
 
-    @ManyToOne
+    @Column(name = "cod_indice", length = 20)
+    private Long codIndice;
+
+    @OneToOne
     @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
     private Indice indice;
 
@@ -34,12 +37,13 @@ public class TipoInvestimento {
     public TipoInvestimento() {
     }
 
-    public TipoInvestimento(String codIndice, Long codInvestimento, String descricao, String incideIof, String incideIr, Indice indice) {
+    public TipoInvestimento(Long codInvestimento, String descricao, String incideIof, String incideIr, Indice indice) {
         this.codInvestimento = codInvestimento;
         this.descricao = descricao;
         this.incideIof = incideIof;
         this.incideIr = incideIr;
         this.indice = indice;
+        this.codIndice = indice.getCodIndice();
     }
 
     public Long getCodInvestimento() {
@@ -54,8 +58,13 @@ public class TipoInvestimento {
         return indice;
     }
 
+    public Long getCodIndice() {
+        return codIndice;
+    }
+
     public void setIndice(Indice indice) {
         this.indice = indice;
+        this.codIndice = indice.getCodIndice();
     }
 
     public String getDescricao() {
