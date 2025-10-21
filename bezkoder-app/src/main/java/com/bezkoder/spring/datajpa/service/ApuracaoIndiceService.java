@@ -1,9 +1,9 @@
 package com.bezkoder.spring.datajpa.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,7 +72,7 @@ public class ApuracaoIndiceService {
         if (!indiceOpt.isPresent()) {
             return Optional.empty();
         }
-        ApuracaoIndiceId id = new ApuracaoIndiceId(indiceOpt.get(), dataApuracao);
+        ApuracaoIndiceId id = new ApuracaoIndiceId(indiceOpt.get().getCodIndice(), dataApuracao);
         Optional<ApuracaoIndice> apuracao = apuracaoIndiceRepository.findById(id);
         return apuracao.map(this::convertToDTO);
     }
@@ -99,7 +99,7 @@ public class ApuracaoIndiceService {
         if (!indiceOpt.isPresent()) {
             return Optional.empty();
         }
-        ApuracaoIndiceId id = new ApuracaoIndiceId(indiceOpt.get(), dataApuracao);
+        ApuracaoIndiceId id = new ApuracaoIndiceId(indiceOpt.get().getCodIndice(), dataApuracao);
         Optional<ApuracaoIndice> apuracaoOpt = apuracaoIndiceRepository.findById(id);
         if (!apuracaoOpt.isPresent()) {
             return Optional.empty();
@@ -119,7 +119,7 @@ public class ApuracaoIndiceService {
         if (!indiceOpt.isPresent()) {
             return false;
         }
-        ApuracaoIndiceId id = new ApuracaoIndiceId(indiceOpt.get(), dataApuracao);
+        ApuracaoIndiceId id = new ApuracaoIndiceId(indiceOpt.get().getCodIndice(), dataApuracao);
         try {
             apuracaoIndiceRepository.deleteById(id);
             return true;
