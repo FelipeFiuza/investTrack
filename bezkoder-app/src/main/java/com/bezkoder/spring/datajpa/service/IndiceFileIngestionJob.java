@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,14 @@ public class IndiceFileIngestionJob implements CommandLineRunner{
 
     private static final Logger log = LoggerFactory.getLogger(IndiceFileIngestionJob.class);
 
-    private static final String FILE_PATH = "data/COTAHIST_A2024.TXT";
+    private static final List<String> FILE_PATHS = Arrays.asList(
+        "data/COTAHIST_A2021.TXT",
+        "data/COTAHIST_A2022.TXT", 
+        "data/COTAHIST_A2023.TXT", 
+        "data/COTAHIST_A2024.TXT", 
+        "data/COTAHIST_A2025.TXT",
+        "data/COTAHIST_A2026.TXT"
+    );
 
     @Autowired
     private IndiceRepository indiceRepository;
@@ -40,18 +49,19 @@ public class IndiceFileIngestionJob implements CommandLineRunner{
 
     @Override
     public void run(String... args) throws Exception {
-        scanAndIngest();
+        for (String filePath : FILE_PATHS) {
+            scanAndIngest(filePath);
+        }
     }
 	
 
-
     // Runs every 10 minutes
-    @Scheduled(cron = "0 */30 * * * *")
-    public void scanAndIngest() {
+    //@Scheduled(cron = "0 */30 * * * *")
+    public void scanAndIngest(String filePath) {
         try {
-            File file = new File(FILE_PATH);
+            File file = new File(filePath);
             if (!file.exists()) {
-                log.warn("COTAHIST file not found at {}", FILE_PATH);
+                log.warn("COTAHIST file not found at {}", filePath);
                 return;
             }
 
@@ -124,7 +134,8 @@ public class IndiceFileIngestionJob implements CommandLineRunner{
             BigDecimal valorAbertura = new BigDecimal(safeSubstring(line, 56, 69).trim());
             BigDecimal valorMaximo = new BigDecimal(safeSubstring(line, 69, 82).trim());
             BigDecimal valorMinimo = new BigDecimal(safeSubstring(line, 82, 95).trim());
-            BigDecimal valorFechamento = new BigDecimal(safeSubstring(line, 95, 108).trim());
+            BigDecimal valorFechamento = new BigDecimal(safeSubstring(line, 108, 121).trim());
+            Integer numeroDistribuicao = Integer.parseInt(safeSubstring(line, 242, 245).trim());
 
             ApuracaoIndice apuracaoIndice = new ApuracaoIndice();
             apuracaoIndice.setIndice(savedIndice);
@@ -133,6 +144,7 @@ public class IndiceFileIngestionJob implements CommandLineRunner{
             apuracaoIndice.setValorMaximo(valorMaximo);
             apuracaoIndice.setValorMinimo(valorMinimo);
             apuracaoIndice.setValorFechamento(valorFechamento);
+            apuracaoIndice.setNumeroDistribuicao(numeroDistribuicao);
             apuracaoIndiceRepository.save(apuracaoIndice);
 
         } catch (Exception ex) {

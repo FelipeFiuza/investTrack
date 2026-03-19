@@ -18,6 +18,7 @@ export interface Transacao {
   quantidade: number;
   codInvestimento?: number;
   idUsuario?: number;
+  descricaoInvestimento?: string;
 }
 
 export interface TransacaoCreateDTO {

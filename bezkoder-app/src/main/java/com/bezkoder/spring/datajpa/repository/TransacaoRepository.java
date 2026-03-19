@@ -11,4 +11,5 @@ import com.bezkoder.spring.datajpa.model.Usuario;
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
     List<Transacao> findByUsuario(Usuario usuario);
+    List<Transacao> findByUsuario_IdUsuario(Long idUsuario);
 }

@@ -3,3 +3,19 @@ https://bvmf.bmfbovespa.com.br/InstDados/SerHist/COTAHIST_D22092025.ZIP
 https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados?formato=json&dataInicial=01/01/2016&dataFinal=23/09/2025
 
 https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries
+
+12 - cdi
+433 - ipca
+189 - igp-m
+226 - tr
+11 - selic
+188 - inpc
+
+40608657
+223558318
+
+curl -O https://bvmf.bmfbovespa.com.br/InstDados/SerHist/COTAHIST_A2025.ZIP
+mv COTAHIST_A2025.ZIP bezkoder-app/data
+cd bezkoder-app/data
+unzip COTAHIST_A2025.ZIP
+C:\Users\Inspiron7559\AppData\Local\wsl\{ffbec952-00e1-4f3b-9f8f-d924ef356a2c}\ext4.vhdx

@@ -40,10 +40,13 @@ public class ApuracaoIndice {
     @Column(name = "valor_fechamento")
     private BigDecimal valorFechamento;
 
+    @Column(name = "numero_distribuicao")
+    private Integer numeroDistribuicao;
+
     public ApuracaoIndice() {
     }
 
-    public ApuracaoIndice(LocalDateTime dataApuracao, Indice indice, BigDecimal valorAbertura, BigDecimal valorFechamento, BigDecimal valorMaximo, BigDecimal valorMinimo) {
+    public ApuracaoIndice(LocalDateTime dataApuracao, Indice indice, BigDecimal valorAbertura, BigDecimal valorFechamento, BigDecimal valorMaximo, BigDecimal valorMinimo, Integer numeroDistribuicao) {
         this.dataApuracao = dataApuracao;
         this.indice = indice;
         this.codIndice = indice.getCodIndice();
@@ -51,6 +54,7 @@ public class ApuracaoIndice {
         this.valorFechamento = valorFechamento;
         this.valorMaximo = valorMaximo;
         this.valorMinimo = valorMinimo;
+        this.numeroDistribuicao = numeroDistribuicao;
     }
 
     public LocalDateTime getDataApuracao() {
@@ -104,6 +108,14 @@ public class ApuracaoIndice {
 
     public void setValorFechamento(BigDecimal valorFechamento) {
         this.valorFechamento = valorFechamento;
+    }
+
+    public Integer getNumeroDistribuicao() {
+        return numeroDistribuicao;
+    }
+
+    public void setNumeroDistribuicao(Integer numeroDistribuicao) {
+        this.numeroDistribuicao = numeroDistribuicao;
     }
 
 }

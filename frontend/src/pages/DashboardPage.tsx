@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { apuracaoIndiceApi } from '../services/api';
 import { ApuracaoIndice } from '../types';
+import AppLayout from '../components/AppLayout';
 import './DashboardPage.css';
 
 const DashboardPage: React.FC = () => {
@@ -49,11 +50,6 @@ const DashboardPage: React.FC = () => {
     loadData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
   const handleAddTransaction = () => {
     navigate('/transacao');
   };
@@ -68,16 +64,8 @@ const DashboardPage: React.FC = () => {
   }));
 
   return (
+    <AppLayout>
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>InvestTrack Dashboard</h1>
-          <button onClick={handleLogout} className="btn btn-secondary">
-            Logout
-          </button>
-        </div>
-      </header>
-
       <main className="dashboard-main">
         <div className="dashboard-grid">
           <div className="chart-card">
@@ -170,6 +158,7 @@ const DashboardPage: React.FC = () => {
         +
       </button>
     </div>
+    </AppLayout>
   );
 };
 
