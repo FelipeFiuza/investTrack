@@ -8,6 +8,8 @@ public class TransacaoCreateUpdateDTO {
     private LocalDateTime dataTransacao;
     private LocalDateTime dataVencimento;
     private String instituicao;
+    // Expected values: "buy" or "sell"
+    private String tipoTransacao;
     private BigDecimal valor;
     private BigDecimal quantidade;
     private Long codInvestimento;
@@ -38,6 +40,14 @@ public class TransacaoCreateUpdateDTO {
 
     public void setInstituicao(String instituicao) {
         this.instituicao = instituicao;
+    }
+
+    public String getTipoTransacao() {
+        return tipoTransacao;
+    }
+
+    public void setTipoTransacao(String tipoTransacao) {
+        this.tipoTransacao = tipoTransacao;
     }
 
     public BigDecimal getValor() {

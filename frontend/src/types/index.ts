@@ -14,6 +14,8 @@ export interface Transacao {
   dataTransacao: string;
   dataVencimento?: string;
   instituicao: string;
+  // Expected values: "buy" or "sell"
+  tipoTransacao?: string;
   valor: number;
   quantidade: number;
   codInvestimento?: number;
@@ -25,6 +27,8 @@ export interface TransacaoCreateDTO {
   dataTransacao: string;
   dataVencimento?: string;
   instituicao: string;
+  // Expected values: "buy" or "sell"
+  tipoTransacao: string;
   valor: number;
   quantidade: number;
   codInvestimento: number;

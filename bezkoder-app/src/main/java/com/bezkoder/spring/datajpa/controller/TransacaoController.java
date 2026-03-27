@@ -59,6 +59,7 @@ public class TransacaoController {
             transacao.setDataTransacao(dto.getDataTransacao());
             transacao.setDataVencimento(dto.getDataVencimento());
             transacao.setInstituicao(dto.getInstituicao());
+            transacao.setTipoTransacao(dto.getTipoTransacao());
             transacao.setValor(dto.getValor());
             transacao.setQuantidade(dto.getQuantidade());
 
@@ -92,6 +93,7 @@ public class TransacaoController {
             transacao.setDataTransacao(dto.getDataTransacao());
             transacao.setDataVencimento(dto.getDataVencimento());
             transacao.setInstituicao(dto.getInstituicao());
+            transacao.setTipoTransacao(dto.getTipoTransacao());
             transacao.setValor(dto.getValor());
             transacao.setQuantidade(dto.getQuantidade());
 
@@ -130,6 +132,7 @@ public class TransacaoController {
         dto.setDataTransacao(t.getDataTransacao());
         dto.setDataVencimento(t.getDataVencimento());
         dto.setInstituicao(t.getInstituicao());
+        dto.setTipoTransacao(t.getTipoTransacao());
         dto.setValor(t.getValor());
         dto.setQuantidade(t.getQuantidade());
         if (t.getUsuario() != null) {

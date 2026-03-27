@@ -16,6 +16,8 @@ const TransacaoFormPage: React.FC = () => {
     valor: 0,
     quantidade: 0,
     codInvestimento: 0,
+    // Expected values: "buy" or "sell"
+    tipoTransacao: 'buy',
     idUsuario: 1 // This should come from the logged-in user
   });
   
@@ -68,6 +70,7 @@ const TransacaoFormPage: React.FC = () => {
           valor: t.valor,
           quantidade: t.quantidade,
           codInvestimento: t.codInvestimento ?? 0,
+          tipoTransacao: t.tipoTransacao ?? 'buy',
           idUsuario: t.idUsuario ?? 1,
         });
 
@@ -114,7 +117,13 @@ const TransacaoFormPage: React.FC = () => {
 
     try {
       // Validate required fields
-      if (!formData.instituicao || !formData.valor || !formData.quantidade || !formData.codInvestimento) {
+      if (
+        !formData.instituicao ||
+        !formData.valor ||
+        !formData.quantidade ||
+        !formData.codInvestimento ||
+        !formData.tipoTransacao
+      ) {
         setError('Please fill in all required fields');
         setLoading(false);
         return;
@@ -214,6 +223,25 @@ const TransacaoFormPage: React.FC = () => {
                       {tipo.descricao}
                     </option>
                   ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="tipoTransacao" className="form-label">
+                  Transaction Type *
+                </label>
+                <select
+                  id="tipoTransacao"
+                  name="tipoTransacao"
+                  value={formData.tipoTransacao}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="buy">buy</option>
+                  <option value="sell">sell</option>
                 </select>
               </div>
             </div>

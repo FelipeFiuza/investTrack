@@ -63,6 +63,14 @@ const TransacoesListPage: React.FC = () => {
     }).format(value);
   };
 
+  const formatBuySell = (value?: string) => {
+    if (!value) return '—';
+    const v = value.toLowerCase();
+    if (v === 'buy') return 'Buy';
+    if (v === 'sell') return 'Sell';
+    return value;
+  };
+
   return (
     <AppLayout>
       <div className="transacoes-list-page">
@@ -95,6 +103,7 @@ const TransacoesListPage: React.FC = () => {
                     <th>Due date</th>
                     <th>Institution</th>
                     <th>Type</th>
+                    <th>Buy/Sell</th>
                     <th>Quantity</th>
                     <th>Value</th>
                     <th className="transacoes-actions-col">Actions</th>
@@ -109,6 +118,7 @@ const TransacoesListPage: React.FC = () => {
                         <td>{formatDate(t.dataVencimento)}</td>
                         <td>{t.instituicao || '—'}</td>
                         <td>{t.descricaoInvestimento || '—'}</td>
+                        <td>{formatBuySell(t.tipoTransacao)}</td>
                         <td>{Number(t.quantidade)}</td>
                         <td>{formatCurrency(Number(t.valor))}</td>
                         <td className="transacoes-actions-col">

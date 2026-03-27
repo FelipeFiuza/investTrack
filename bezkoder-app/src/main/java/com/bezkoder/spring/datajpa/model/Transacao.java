@@ -38,6 +38,10 @@ public class Transacao {
     @Column(name = "instituicao", length = 200)
     private String instituicao;
 
+    // Expected values: "buy" or "sell"
+    @Column(name = "tipo_transacao", length = 4)
+    private String tipoTransacao;
+
     @Column(name = "valor")
     private BigDecimal valor;
 
@@ -104,6 +108,14 @@ public class Transacao {
 
     public void setInstituicao(String instituicao) {
         this.instituicao = instituicao;
+    }
+
+    public String getTipoTransacao() {
+        return tipoTransacao;
+    }
+
+    public void setTipoTransacao(String tipoTransacao) {
+        this.tipoTransacao = tipoTransacao;
     }
 
     public BigDecimal getValor() {
