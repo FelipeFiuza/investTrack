@@ -18,4 +18,9 @@ curl -O https://bvmf.bmfbovespa.com.br/InstDados/SerHist/COTAHIST_A2025.ZIP
 mv COTAHIST_A2025.ZIP bezkoder-app/data
 cd bezkoder-app/data
 unzip COTAHIST_A2025.ZIP
-C:\Users\Inspiron7559\AppData\Local\wsl\{ffbec952-00e1-4f3b-9f8f-d924ef356a2c}\ext4.vhdx
+
+Magazine Luiza (MGLU3): Anunciou agrupamento na proporção de 10 para 1 em 2024.
+IRB Brasil (IRBR3): Aprovou grupamento de 30 para 1.
+Aeris (AERI3): Realizou grupamento de 20 para 1.
+Méliuz (CASH3): Realizou grupamento após desvalorização.
+Recrusul (RCSL3/RCSL4): Citada em calendários de agrupamentos

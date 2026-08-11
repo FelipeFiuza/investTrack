@@ -14,24 +14,24 @@ const DashboardPage: React.FC = () => {
   // Mock data as provided by user
   const mockData = [
     {
-      data_apuracao: "2024-01-08 00:00:00",
-      valor_fechamento: 1370.00
+      dataApuracao: "2024-01-08 00:00:00",
+      valorFechamento: 1370.00
     },
     {
-      data_apuracao: "2024-01-09 00:00:00",
-      valor_fechamento: 1360.00
+      dataApuracao: "2024-01-09 00:00:00",
+      valorFechamento: 1360.00
     },
     {
-      data_apuracao: "2024-01-10 00:00:00",
-      valor_fechamento: 1376.00
+      dataApuracao: "2024-01-10 00:00:00",
+      valorFechamento: 1376.00
     },
     {
-      data_apuracao: "2024-01-11 00:00:00",
-      valor_fechamento: 1358.00
+      dataApuracao: "2024-01-11 00:00:00",
+      valorFechamento: 1358.00
     },
     {
-      data_apuracao: "2024-01-12 00:00:00",
-      valor_fechamento: 1354.00
+      dataApuracao: "2024-01-12 00:00:00",
+      valorFechamento: 1354.00
     }
   ];
 
@@ -39,7 +39,7 @@ const DashboardPage: React.FC = () => {
     const loadData = async () => {
       try {
         // For now, use mock data. In a real app, you'd fetch from API
-        setChartData(mockData);
+        setChartData(mockData as unknown as ApuracaoIndice[]);
         setLoading(false);
       } catch (error) {
         console.error('Error loading chart data:', error);
@@ -56,11 +56,11 @@ const DashboardPage: React.FC = () => {
 
   // Format data for the chart
   const formattedData = chartData.map(item => ({
-    date: new Date(item.data_apuracao).toLocaleDateString('pt-BR', { 
+    date: new Date(item.dataApuracao).toLocaleDateString('pt-BR', { 
       month: 'short', 
       day: 'numeric' 
     }),
-    value: item.valor_fechamento
+    value: item.valorFechamento
   }));
 
   return (

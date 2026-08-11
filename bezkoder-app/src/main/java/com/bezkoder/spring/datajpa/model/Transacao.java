@@ -42,13 +42,19 @@ public class Transacao {
     @Column(name = "tipo_transacao", length = 4)
     private String tipoTransacao;
 
-    @Column(name = "valor")
-    private BigDecimal valor;
+    @Column(name = "valor_total")
+    private BigDecimal valorTotal;
+
+    @Column(name = "valor_unitario")
+    private BigDecimal valorUnitario;
+
+    @Column(name = "taxas_impostos")
+    private BigDecimal taxasImpostos;
 
     @Column(name = "quantidade")
     private BigDecimal quantidade;
 
-    public Transacao(Long codInvestimento, LocalDateTime dataTransacao, LocalDateTime dataVencimento, Long idTransacao, Long idUsuario, String instituicao, TipoInvestimento investimento, BigDecimal quantidade, Usuario usuario, BigDecimal valor) {
+    public Transacao(Long codInvestimento, LocalDateTime dataTransacao, LocalDateTime dataVencimento, Long idTransacao, Long idUsuario, String instituicao, TipoInvestimento investimento, BigDecimal quantidade, Usuario usuario, BigDecimal valorTotal, BigDecimal valorUnitario, BigDecimal taxasImpostos) {
         this.dataTransacao = dataTransacao;
         this.dataVencimento = dataVencimento;
         this.idTransacao = idTransacao;
@@ -56,7 +62,9 @@ public class Transacao {
         this.investimento = investimento;
         this.quantidade = quantidade;
         this.usuario = usuario;
-        this.valor = valor;
+        this.valorTotal = valorTotal;
+        this.valorUnitario = valorUnitario;
+        this.taxasImpostos = taxasImpostos;
     }
 
     public Transacao() {
@@ -118,12 +126,28 @@ public class Transacao {
         this.tipoTransacao = tipoTransacao;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public BigDecimal getValorTotal() {
+        return valorTotal;
     }
 
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
+    public void setValorTotal(BigDecimal valorTotal) {
+        this.valorTotal = valorTotal;
+    }
+
+    public BigDecimal getValorUnitario() {
+        return valorUnitario;
+    }
+
+    public void setValorUnitario(BigDecimal valorUnitario) {
+        this.valorUnitario = valorUnitario;
+    }
+
+    public BigDecimal getTaxasImpostos() {
+        return taxasImpostos;
+    }
+
+    public void setTaxasImpostos(BigDecimal taxasImpostos) {
+        this.taxasImpostos = taxasImpostos;
     }
 
     public BigDecimal getQuantidade() {

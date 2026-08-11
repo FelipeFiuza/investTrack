@@ -60,7 +60,7 @@ public class TransacaoController {
             transacao.setDataVencimento(dto.getDataVencimento());
             transacao.setInstituicao(dto.getInstituicao());
             transacao.setTipoTransacao(dto.getTipoTransacao());
-            transacao.setValor(dto.getValor());
+            transacao.setValorTotal(dto.getValor());
             transacao.setQuantidade(dto.getQuantidade());
 
             // These relationships may be partially read-only depending on the entity mapping.
@@ -94,7 +94,7 @@ public class TransacaoController {
             transacao.setDataVencimento(dto.getDataVencimento());
             transacao.setInstituicao(dto.getInstituicao());
             transacao.setTipoTransacao(dto.getTipoTransacao());
-            transacao.setValor(dto.getValor());
+            transacao.setValorTotal(dto.getValor());
             transacao.setQuantidade(dto.getQuantidade());
 
             if (dto.getCodInvestimento() != null) {
@@ -133,7 +133,7 @@ public class TransacaoController {
         dto.setDataVencimento(t.getDataVencimento());
         dto.setInstituicao(t.getInstituicao());
         dto.setTipoTransacao(t.getTipoTransacao());
-        dto.setValor(t.getValor());
+        dto.setValor(t.getValorTotal());
         dto.setQuantidade(t.getQuantidade());
         if (t.getUsuario() != null) {
             dto.setIdUsuario(t.getUsuario().getIdUsuario());

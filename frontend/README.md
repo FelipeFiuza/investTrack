@@ -65,7 +65,7 @@ src/
 
 ## API Integration
 
-The frontend is configured to communicate with the Spring Boot backend running on `http://localhost:8080`. The API endpoints include:
+The frontend is configured to communicate with the Spring Boot backend running on `http://localhost:8081`. The API endpoints include:
 
 - `/api/usuarios` - User management
 - `/api/transacoes` - Transaction management (to be implemented)
