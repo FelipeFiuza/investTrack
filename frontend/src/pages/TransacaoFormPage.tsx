@@ -67,7 +67,7 @@ const TransacaoFormPage: React.FC = () => {
           dataTransacao: toDateTimeLocal(t.dataTransacao),
           dataVencimento: toDateTimeLocal(t.dataVencimento),
           instituicao: t.instituicao,
-          valor: t.valor,
+          valor: t.valor/100,
           quantidade: t.quantidade,
           codInvestimento: t.codInvestimento ?? 0,
           tipoTransacao: t.tipoTransacao ?? 'buy',

@@ -60,7 +60,7 @@ const TransacoesListPage: React.FC = () => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(value);
+    }).format(value/100);
   };
 
   const formatBuySell = (value?: string) => {

@@ -52,3 +52,32 @@ export interface Indice {
   descricao: string;
   tipoIndice: string;
 }
+
+export interface PosicaoDiaria {
+  day: string;
+  currentQty?: number | null;
+  currentAverageCost?: number | null;
+  boughtQty?: number | null;
+  boughtPrice?: number | null;
+  boughtTaxes?: number | null;
+  soldQty?: number | null;
+  soldPrice?: number | null;
+  soldTaxes?: number | null;
+  valorFechamento?: number | null;
+  grossTotalAmount?: number | null;
+  netTotalAmount?: number | null;
+  grossVariation?: number | null;
+  netVariation?: number | null;
+}
+
+export interface InvestimentoSerie {
+  codInvestimento: number;
+  descricao: string;
+  posicoes: PosicaoDiaria[];
+}
+
+export interface DashboardPosicaoResponse {
+  inicio: string;
+  fim: string;
+  investimentos: InvestimentoSerie[];
+}
