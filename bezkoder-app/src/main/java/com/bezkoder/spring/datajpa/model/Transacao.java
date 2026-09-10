@@ -22,11 +22,11 @@ public class Transacao {
     private Long idTransacao;
 
     @ManyToOne
-    @JoinColumn(name = "cod_investimento", insertable = false, updatable = false)
+    @JoinColumn(name = "cod_investimento")
     private TipoInvestimento investimento;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
     @Column(name = "data_transacao")

@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bezkoder.spring.datajpa.dto.TransacaoCreateUpdateDTO;
 import com.bezkoder.spring.datajpa.dto.TransacaoDTO;
+import com.bezkoder.spring.datajpa.dto.TransacaoImportRequestDTO;
 import com.bezkoder.spring.datajpa.model.TipoInvestimento;
 import com.bezkoder.spring.datajpa.model.Usuario;
 import com.bezkoder.spring.datajpa.model.Transacao;
 import com.bezkoder.spring.datajpa.repository.TipoInvestimentoRepository;
 import com.bezkoder.spring.datajpa.repository.UsuarioRepository;
 import com.bezkoder.spring.datajpa.repository.TransacaoRepository;
+import com.bezkoder.spring.datajpa.service.TransacaoImportService;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -31,6 +33,9 @@ public class TransacaoController {
 
     @Autowired
     private TipoInvestimentoRepository tipoInvestimentoRepository;
+
+    @Autowired
+    private TransacaoImportService transacaoImportService;
 
     @GetMapping
     public ResponseEntity<List<TransacaoDTO>> getAll(@RequestParam(defaultValue = "1") Long idUsuario) {
@@ -61,10 +66,9 @@ public class TransacaoController {
             transacao.setInstituicao(dto.getInstituicao());
             transacao.setTipoTransacao(dto.getTipoTransacao());
             transacao.setValorTotal(dto.getValor());
+            transacao.setValorUnitario(dto.getValorUnitario());
             transacao.setQuantidade(dto.getQuantidade());
 
-            // These relationships may be partially read-only depending on the entity mapping.
-            // Still, we set them when provided so the FK can update if allowed.
             if (dto.getCodInvestimento() != null) {
                 TipoInvestimento investimento = tipoInvestimentoRepository.findById(dto.getCodInvestimento()).orElse(null);
                 transacao.setInvestimento(investimento);
@@ -95,6 +99,7 @@ public class TransacaoController {
             transacao.setInstituicao(dto.getInstituicao());
             transacao.setTipoTransacao(dto.getTipoTransacao());
             transacao.setValorTotal(dto.getValor());
+            transacao.setValorUnitario(dto.getValorUnitario());
             transacao.setQuantidade(dto.getQuantidade());
 
             if (dto.getCodInvestimento() != null) {
@@ -108,6 +113,18 @@ public class TransacaoController {
 
             Transacao saved = transacaoRepository.save(transacao);
             return new ResponseEntity<>(toDTO(saved), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<List<TransacaoDTO>> importTransacoes(@RequestBody TransacaoImportRequestDTO request) {
+        try {
+            List<TransacaoDTO> saved = transacaoImportService.importTransacoes(request);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

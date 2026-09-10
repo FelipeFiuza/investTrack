@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import TransacaoFormPage from './pages/TransacaoFormPage';
 import TransacoesListPage from './pages/TransacoesListPage';
+import UploadPage from './pages/UploadPage';
 import './App.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/transactions" element={<TransacoesListPage />} />
+          <Route path="/upload" element={<UploadPage />} />
           <Route path="/transacao" element={<TransacaoFormPage />} />
           <Route path="/transacao/:id" element={<TransacaoFormPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Usuario, UsuarioCreateDTO, Transacao, TransacaoCreateDTO, ApuracaoIndice, TipoInvestimento, Indice, DashboardPosicaoResponse } from '../types';
+import { Usuario, UsuarioCreateDTO, Transacao, TransacaoCreateDTO, TransacaoImportRequest, ApuracaoIndice, TipoInvestimento, Indice, DashboardPosicaoResponse } from '../types';
 
 const API_BASE_URL = 'http://localhost:6868/api';
 
@@ -27,6 +27,7 @@ export const transacaoApi = {
   create: (data: TransacaoCreateDTO) => api.post<Transacao>('/transacoes', data),
   update: (id: number, data: Partial<Transacao>) => api.put<Transacao>(`/transacoes/${id}`, data),
   delete: (id: number) => api.delete(`/transacoes/${id}`),
+  importBatch: (data: TransacaoImportRequest) => api.post<Transacao[]>('/transacoes/import', data),
 };
 
 // ApuracaoIndice API

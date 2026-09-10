@@ -13,4 +13,5 @@ public interface TipoInvestimentoRepository extends JpaRepository<TipoInvestimen
     List<TipoInvestimento> findByDescricaoContaining(String descricao);
     TipoInvestimento findByIndice(Indice indice);
     boolean existsByIndice(Indice indice);
+    List<TipoInvestimento> findByIndice_DescricaoIgnoreCase(String descricao);
 }

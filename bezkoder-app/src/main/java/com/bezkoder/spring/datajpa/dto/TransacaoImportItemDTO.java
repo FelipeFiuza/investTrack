@@ -3,20 +3,18 @@ package com.bezkoder.spring.datajpa.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class TransacaoCreateUpdateDTO {
+public class TransacaoImportItemDTO {
 
     private LocalDateTime dataTransacao;
-    private LocalDateTime dataVencimento;
     private String instituicao;
-    // Expected values: "buy" or "sell"
     private String tipoTransacao;
     private BigDecimal valor;
     private BigDecimal valorUnitario;
     private BigDecimal quantidade;
-    private Long codInvestimento;
-    private Long idUsuario;
+    private String ticker;
+    private String produto;
 
-    public TransacaoCreateUpdateDTO() {
+    public TransacaoImportItemDTO() {
     }
 
     public LocalDateTime getDataTransacao() {
@@ -25,14 +23,6 @@ public class TransacaoCreateUpdateDTO {
 
     public void setDataTransacao(LocalDateTime dataTransacao) {
         this.dataTransacao = dataTransacao;
-    }
-
-    public LocalDateTime getDataVencimento() {
-        return dataVencimento;
-    }
-
-    public void setDataVencimento(LocalDateTime dataVencimento) {
-        this.dataVencimento = dataVencimento;
     }
 
     public String getInstituicao() {
@@ -75,20 +65,19 @@ public class TransacaoCreateUpdateDTO {
         this.quantidade = quantidade;
     }
 
-    public Long getCodInvestimento() {
-        return codInvestimento;
+    public String getTicker() {
+        return ticker;
     }
 
-    public void setCodInvestimento(Long codInvestimento) {
-        this.codInvestimento = codInvestimento;
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
     }
 
-    public Long getIdUsuario() {
-        return idUsuario;
+    public String getProduto() {
+        return produto;
     }
 
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setProduto(String produto) {
+        this.produto = produto;
     }
 }
-

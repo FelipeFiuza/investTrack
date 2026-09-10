@@ -35,6 +35,22 @@ export interface TransacaoCreateDTO {
   idUsuario: number;
 }
 
+export interface TransacaoImportItem {
+  dataTransacao: string;
+  instituicao: string;
+  tipoTransacao: string;
+  valor: number;
+  valorUnitario: number;
+  quantidade: number;
+  ticker: string;
+  produto: string;
+}
+
+export interface TransacaoImportRequest {
+  idUsuario: number;
+  transacoes: TransacaoImportItem[];
+}
+
 export interface ApuracaoIndice {
   dataApuracao: string;
   valorFechamento: number;

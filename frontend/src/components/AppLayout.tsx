@@ -38,6 +38,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           >
             Transaction
           </Link>
+          <Link
+            to="/upload"
+            className={`side-menu-item ${location.pathname === '/upload' ? 'active' : ''}`}
+          >
+            Upload
+          </Link>
         </nav>
         <div className="side-menu-footer">
           <button onClick={handleLogout} className="btn btn-secondary side-menu-logout">
