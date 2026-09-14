@@ -7,9 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,8 @@ public class DashboardService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public DashboardPosicaoResponse getPosicoes(Long idUsuario, LocalDate inicio, LocalDate fim) {
+    public DashboardPosicaoResponse getPosicoes(Long idUsuario, LocalDate inicio, LocalDate fim,
+            List<Long> idsExcluidos) {
         if (fim == null) {
             fim = LocalDate.now();
         }
@@ -49,14 +52,17 @@ public class DashboardService {
             fim = swap;
         }
 
-        Map<Long, TipoInvestimento> ativos = findInvestimentosAte(idUsuario, fim);
+        Set<Long> excluded = toExcludedSet(idsExcluidos);
+        String excludedCsv = toCsv(excluded);
+        Map<Long, TipoInvestimento> ativos = findInvestimentosAte(idUsuario, fim, excluded);
         List<InvestimentoSerieDTO> series = new ArrayList<InvestimentoSerieDTO>();
 
         for (Map.Entry<Long, TipoInvestimento> entry : ativos.entrySet()) {
             Long codInvestimento = entry.getKey();
             TipoInvestimento tipo = entry.getValue();
             try {
-                List<PosicaoDiariaDTO> posicoes = queryPosicaoDiaria(idUsuario, codInvestimento, inicio, fim);
+                List<PosicaoDiariaDTO> posicoes = queryPosicaoDiaria(idUsuario, codInvestimento, inicio, fim,
+                        excludedCsv);
                 if (posicoes == null || posicoes.isEmpty()) {
                     continue;
                 }
@@ -72,10 +78,13 @@ public class DashboardService {
         return new DashboardPosicaoResponse(inicio, fim, series);
     }
 
-    private Map<Long, TipoInvestimento> findInvestimentosAte(Long idUsuario, LocalDate dataFim) {
+    private Map<Long, TipoInvestimento> findInvestimentosAte(Long idUsuario, LocalDate dataFim, Set<Long> excluded) {
         Map<Long, TipoInvestimento> byCod = new LinkedHashMap<Long, TipoInvestimento>();
         List<Transacao> transacoes = transacaoRepository.findByUsuario_IdUsuario(idUsuario);
         for (Transacao transacao : transacoes) {
+            if (transacao.getIdTransacao() != null && excluded.contains(transacao.getIdTransacao())) {
+                continue;
+            }
             if (transacao.getInvestimento() == null || transacao.getInvestimento().getCodInvestimento() == null) {
                 continue;
             }
@@ -89,16 +98,17 @@ public class DashboardService {
     }
 
     private List<PosicaoDiariaDTO> queryPosicaoDiaria(final Long idUsuario, final Long codInvestimento,
-            final LocalDate inicio, final LocalDate fim) {
+            final LocalDate inicio, final LocalDate fim, final String idsExcluidosCsv) {
         return jdbcTemplate.execute(new ConnectionCallback<List<PosicaoDiariaDTO>>() {
             @Override
             public List<PosicaoDiariaDTO> doInConnection(Connection con) throws SQLException {
-                CallableStatement cs = con.prepareCall("{call get_posicao_diaria(?, ?, ?, ?)}");
+                CallableStatement cs = con.prepareCall("{call get_posicao_diaria(?, ?, ?, ?, ?)}");
                 try {
                     cs.setLong(1, idUsuario);
                     cs.setLong(2, codInvestimento);
                     cs.setDate(3, java.sql.Date.valueOf(inicio));
                     cs.setDate(4, java.sql.Date.valueOf(fim));
+                    cs.setString(5, idsExcluidosCsv == null ? "" : idsExcluidosCsv);
 
                     boolean hasResult = cs.execute();
                     List<PosicaoDiariaDTO> rows = new ArrayList<PosicaoDiariaDTO>();
@@ -151,5 +161,34 @@ public class DashboardService {
     private BigDecimal getDecimal(ResultSet rs, String column) throws SQLException {
         BigDecimal value = rs.getBigDecimal(column);
         return rs.wasNull() ? null : value;
+    }
+
+    private Set<Long> toExcludedSet(List<Long> idsExcluidos) {
+        Set<Long> excluded = new HashSet<Long>();
+        if (idsExcluidos == null) {
+            return excluded;
+        }
+        for (Long id : idsExcluidos) {
+            if (id != null) {
+                excluded.add(id);
+            }
+        }
+        return excluded;
+    }
+
+    private String toCsv(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Long id : ids) {
+            if (!first) {
+                sb.append(',');
+            }
+            sb.append(id);
+            first = false;
+        }
+        return sb.toString();
     }
 }

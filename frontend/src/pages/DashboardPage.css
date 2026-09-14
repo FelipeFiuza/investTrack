@@ -71,10 +71,32 @@
   gap: 8px;
 }
 
-.chart-control span {
+.chart-control > span {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.select-tx-btn {
+  background-color: var(--tertiary-color);
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 10px;
+  font-size: 14px;
+  min-height: 42px;
+  font-weight: 200;
+}
+
+.select-tx-count {
+  background: var(--primary-color);
+  color: white;
+  border-radius: 999px;
+  font-size: 12px;
+  padding: 2px 8px;
+  margin-left: 10px;
 }
 
 .chart-control .form-select {

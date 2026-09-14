@@ -36,7 +36,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 : ''
             }`}
           >
-            Transaction
+            Transações
           </Link>
           <Link
             to="/upload"

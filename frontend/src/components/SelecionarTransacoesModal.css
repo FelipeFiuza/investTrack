@@ -1,0 +1,141 @@
+.tx-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 55, 72, 0.55);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.tx-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  width: min(960px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+.tx-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tx-modal-header h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.tx-modal-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  max-width: 720px;
+}
+
+.tx-modal-close {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0 4px;
+}
+
+.tx-modal-close:hover {
+  color: var(--text-primary);
+}
+
+.tx-modal-body {
+  overflow: auto;
+  min-height: 180px;
+}
+
+.tx-modal-status {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.tx-modal-error {
+  color: var(--error-color);
+}
+
+.tx-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tx-modal-table th,
+.tx-modal-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+}
+
+.tx-modal-table th {
+  position: sticky;
+  top: 0;
+  background: var(--background-light);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.tx-modal-check-col {
+  width: 44px;
+}
+
+.tx-modal-row-off td {
+  opacity: 0.45;
+}
+
+.tx-modal-type {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tx-modal-type-buy {
+  background: rgba(72, 187, 120, 0.15);
+  color: #276749;
+}
+
+.tx-modal-type-sell {
+  background: rgba(245, 101, 101, 0.15);
+  color: #c53030;
+}
+
+.tx-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .tx-modal-overlay {
+    padding: 12px;
+  }
+
+  .tx-modal-header,
+  .tx-modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

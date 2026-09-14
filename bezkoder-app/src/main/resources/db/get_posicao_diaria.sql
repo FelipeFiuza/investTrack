@@ -2,7 +2,8 @@
 -- MySQL 5.7 não tem table-valued functions: stored PROCEDURE com result set.
 --
 -- Uso:
---   CALL get_posicao_diaria(1, 423, '2024-07-25', '2024-08-05');
+--   CALL get_posicao_diaria(1, 423, '2024-07-25', '2024-08-05', '');
+--   CALL get_posicao_diaria(1, 423, '2024-07-25', '2024-08-05', '10,22,31');
 --
 -- Colunas:
 --   day, current_qty, current_average_cost,
@@ -38,7 +39,8 @@ CREATE PROCEDURE get_posicao_diaria(
     IN p_id_usuario BIGINT,
     IN p_cod_investimento BIGINT,
     IN p_data_inicio DATE,
-    IN p_data_fim DATE
+    IN p_data_fim DATE,
+    IN p_ids_excluidos TEXT
 )
 BEGIN
     DECLARE v_cod_indice BIGINT DEFAULT NULL;
@@ -138,6 +140,11 @@ BEGIN
      WHERE t.id_usuario = p_id_usuario
        AND t.cod_investimento = p_cod_investimento
        AND DATE(t.data_transacao) <= p_data_fim
+       AND (
+            p_ids_excluidos IS NULL
+            OR p_ids_excluidos = ''
+            OR FIND_IN_SET(t.id_transacao, p_ids_excluidos) = 0
+       )
      ORDER BY t.data_transacao, t.id_transacao;
 
     INSERT INTO tmp_posicao_dias (dia, valor_fechamento)
@@ -160,6 +167,11 @@ BEGIN
          WHERE t.id_usuario = p_id_usuario
            AND t.cod_investimento = p_cod_investimento
            AND DATE(t.data_transacao) BETWEEN p_data_inicio AND p_data_fim
+           AND (
+                p_ids_excluidos IS NULL
+                OR p_ids_excluidos = ''
+                OR FIND_IN_SET(t.id_transacao, p_ids_excluidos) = 0
+           )
     ) d
     LEFT JOIN (
         SELECT DATE(ai.data_apuracao) AS dia, MAX(ai.valor_fechamento) AS valor_fechamento

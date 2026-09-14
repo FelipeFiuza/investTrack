@@ -10,9 +10,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { dashboardApi } from '../services/api';
-import { DashboardPosicaoResponse, InvestimentoSerie, PosicaoDiaria } from '../types';
+import { dashboardApi, transacaoApi } from '../services/api';
+import { DashboardPosicaoResponse, InvestimentoSerie, PosicaoDiaria, Transacao } from '../types';
 import AppLayout from '../components/AppLayout';
+import SelecionarTransacoesModal from '../components/SelecionarTransacoesModal';
+import {
+  allTransactionIds,
+  applyTransactionToggle,
+  sortTransacoes,
+} from '../utils/transactionSelection';
 import './DashboardPage.css';
 
 type AmountBasis = 'gross' | 'net';
@@ -227,10 +233,22 @@ const DashboardPage: React.FC = () => {
   const [metric, setMetric] = useState<MetricKind>('value');
   const [startOffset, setStartOffset] = useState(PERIOD_MONTHS_MAX - PERIOD_MONTHS_DEFAULT);
   const [endOffset, setEndOffset] = useState(PERIOD_MONTHS_MAX);
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<number> | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [loadingTx, setLoadingTx] = useState(false);
+  const [txError, setTxError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const inicio = toISODate(dateFromOffset(Math.min(startOffset, endOffset), false));
   const fim = toISODate(dateFromOffset(Math.max(startOffset, endOffset), true));
+
+  const excludedIds = useMemo(() => {
+    if (!selectedIds || transacoes.length === 0) return [];
+    return allTransactionIds(transacoes).filter((id) => !selectedIds.has(id));
+  }, [selectedIds, transacoes]);
+
+  const excludedKey = excludedIds.join(',');
 
   useEffect(() => {
     let cancelled = false;
@@ -238,7 +256,18 @@ const DashboardPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await dashboardApi.getPosicoes(getUserId(), inicio, fim);
+        const ids = excludedKey
+          ? excludedKey
+              .split(',')
+              .map((id) => Number(id))
+              .filter((id) => Number.isFinite(id))
+          : [];
+        const res = await dashboardApi.getPosicoes(
+          getUserId(),
+          inicio,
+          fim,
+          ids.length ? ids : undefined
+        );
         if (!cancelled) {
           setData(res.data);
         }
@@ -258,9 +287,9 @@ const DashboardPage: React.FC = () => {
       cancelled = true;
       window.clearTimeout(handle);
     };
-  }, [inicio, fim]);
+  }, [inicio, fim, excludedKey]);
 
-  const investimentos = data?.investimentos || [];
+  const investimentos = useMemo(() => data?.investimentos || [], [data]);
 
   const chartData = useMemo(
     () => buildChartData(investimentos, basis, metric),
@@ -273,6 +302,53 @@ const DashboardPage: React.FC = () => {
     stats.totalValue !== null && stats.prevValue && stats.prevValue !== 0
       ? (stats.totalValue - stats.prevValue) / stats.prevValue
       : null;
+
+  const sortedTransacoes = useMemo(
+    () => transacoes.slice().sort(sortTransacoes),
+    [transacoes]
+  );
+
+  const selectedCount = selectedIds ? selectedIds.size : transacoes.length;
+  const totalCount = allTransactionIds(transacoes).length;
+
+  const ensureTransacoes = async (): Promise<Transacao[]> => {
+    if (transacoes.length > 0) {
+      return transacoes;
+    }
+    setLoadingTx(true);
+    setTxError(null);
+    try {
+      const res = await transacaoApi.getAll(getUserId());
+      const list = res.data || [];
+      setTransacoes(list);
+      setSelectedIds((prev) => {
+        if (prev) return prev;
+        return new Set(allTransactionIds(list));
+      });
+      return list;
+    } catch {
+      setTxError('Não foi possível carregar as transações.');
+      return [];
+    } finally {
+      setLoadingTx(false);
+    }
+  };
+
+  const handleOpenSelection = async () => {
+    setModalOpen(true);
+    await ensureTransacoes();
+  };
+
+  const handleToggleTransaction = (id: number, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const current = prev || new Set(allTransactionIds(transacoes));
+      return applyTransactionToggle(transacoes, current, id, checked);
+    });
+  };
+
+  const handleToggleAll = (checked: boolean) => {
+    setSelectedIds(checked ? new Set(allTransactionIds(transacoes)) : new Set());
+  };
 
   const handleAddTransaction = () => {
     navigate('/transacao');
@@ -348,6 +424,22 @@ const DashboardPage: React.FC = () => {
                     <option value="return">Rentabilidade</option>
                   </select>
                 </label>
+
+                <div className="chart-control">
+                  <span>Transações</span>
+                  <button
+                    type="button"
+                    className="btn btn-secondary select-tx-btn"
+                    onClick={handleOpenSelection}
+                  >
+                    Selecionar transações ...
+                    {totalCount > 0 && selectedCount < totalCount ? (
+                      <span className="select-tx-count">
+                        {selectedCount}/{totalCount}
+                      </span>
+                    ) : null}
+                  </button>
+                </div>
               </div>
 
               <div className="period-control">
@@ -520,6 +612,17 @@ const DashboardPage: React.FC = () => {
           +
         </button>
       </div>
+
+      <SelecionarTransacoesModal
+        open={modalOpen}
+        transacoes={sortedTransacoes}
+        selectedIds={selectedIds || new Set(allTransactionIds(sortedTransacoes))}
+        loading={loadingTx}
+        error={txError}
+        onClose={() => setModalOpen(false)}
+        onToggle={handleToggleTransaction}
+        onToggleAll={handleToggleAll}
+      />
     </AppLayout>
   );
 };

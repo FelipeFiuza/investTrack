@@ -51,9 +51,14 @@ export const indiceApi = {
 };
 
 export const dashboardApi = {
-  getPosicoes: (idUsuario: number, inicio: string, fim: string) =>
+  getPosicoes: (idUsuario: number, inicio: string, fim: string, idsExcluidos?: number[]) =>
     api.get<DashboardPosicaoResponse>('/dashboard/posicoes', {
-      params: { idUsuario, inicio, fim },
+      params: {
+        idUsuario,
+        inicio,
+        fim,
+        ...(idsExcluidos && idsExcluidos.length > 0 ? { idsExcluidos: idsExcluidos.join(',') } : {}),
+      },
     }),
 };
 
