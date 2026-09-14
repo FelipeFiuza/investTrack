@@ -1,0 +1,110 @@
+.transacoes-list-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.transacoes-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.transacoes-list-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.transacoes-list-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.transacoes-table-wrapper {
+  overflow-x: auto;
+}
+
+.transacoes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transacoes-table th,
+.transacoes-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transacoes-table th {
+  background: var(--background-light);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.transacoes-table tbody tr:hover {
+  background: var(--background-light);
+}
+
+.transacoes-table td {
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.transacoes-actions-col {
+  text-align: right;
+  width: 120px;
+  white-space: nowrap;
+}
+
+.transacoes-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.transacao-action-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.05s ease;
+}
+
+.transacao-action-btn:hover {
+  background: var(--background-light);
+}
+
+.transacao-action-edit:hover {
+  color: var(--primary-color);
+}
+
+.transacao-action-delete:hover {
+  color: var(--error-color);
+}
+
+.transacoes-list-error,
+.transacoes-list-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.transacoes-list-error {
+  color: var(--error-color);
+}
+
+.transacoes-list-page .loading-spinner {
+  padding: 48px;
+}

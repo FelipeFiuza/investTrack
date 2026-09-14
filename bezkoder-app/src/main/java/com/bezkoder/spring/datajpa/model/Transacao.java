@@ -22,11 +22,11 @@ public class Transacao {
     private Long idTransacao;
 
     @ManyToOne
-    @JoinColumn(name = "cod_investimento", insertable = false, updatable = false)
+    @JoinColumn(name = "cod_investimento")
     private TipoInvestimento investimento;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
     @Column(name = "data_transacao")
@@ -38,13 +38,23 @@ public class Transacao {
     @Column(name = "instituicao", length = 200)
     private String instituicao;
 
-    @Column(name = "valor")
-    private BigDecimal valor;
+    // Expected values: "buy" or "sell"
+    @Column(name = "tipo_transacao", length = 4)
+    private String tipoTransacao;
+
+    @Column(name = "valor_total")
+    private BigDecimal valorTotal;
+
+    @Column(name = "valor_unitario")
+    private BigDecimal valorUnitario;
+
+    @Column(name = "taxas_impostos")
+    private BigDecimal taxasImpostos;
 
     @Column(name = "quantidade")
     private BigDecimal quantidade;
 
-    public Transacao(Long codInvestimento, LocalDateTime dataTransacao, LocalDateTime dataVencimento, Long idTransacao, Long idUsuario, String instituicao, TipoInvestimento investimento, BigDecimal quantidade, Usuario usuario, BigDecimal valor) {
+    public Transacao(Long codInvestimento, LocalDateTime dataTransacao, LocalDateTime dataVencimento, Long idTransacao, Long idUsuario, String instituicao, TipoInvestimento investimento, BigDecimal quantidade, Usuario usuario, BigDecimal valorTotal, BigDecimal valorUnitario, BigDecimal taxasImpostos) {
         this.dataTransacao = dataTransacao;
         this.dataVencimento = dataVencimento;
         this.idTransacao = idTransacao;
@@ -52,7 +62,9 @@ public class Transacao {
         this.investimento = investimento;
         this.quantidade = quantidade;
         this.usuario = usuario;
-        this.valor = valor;
+        this.valorTotal = valorTotal;
+        this.valorUnitario = valorUnitario;
+        this.taxasImpostos = taxasImpostos;
     }
 
     public Transacao() {
@@ -106,12 +118,36 @@ public class Transacao {
         this.instituicao = instituicao;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public String getTipoTransacao() {
+        return tipoTransacao;
     }
 
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
+    public void setTipoTransacao(String tipoTransacao) {
+        this.tipoTransacao = tipoTransacao;
+    }
+
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(BigDecimal valorTotal) {
+        this.valorTotal = valorTotal;
+    }
+
+    public BigDecimal getValorUnitario() {
+        return valorUnitario;
+    }
+
+    public void setValorUnitario(BigDecimal valorUnitario) {
+        this.valorUnitario = valorUnitario;
+    }
+
+    public BigDecimal getTaxasImpostos() {
+        return taxasImpostos;
+    }
+
+    public void setTaxasImpostos(BigDecimal taxasImpostos) {
+        this.taxasImpostos = taxasImpostos;
     }
 
     public BigDecimal getQuantidade() {
