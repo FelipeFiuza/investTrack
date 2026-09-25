@@ -92,7 +92,33 @@ export interface InvestimentoSerie {
   posicoes: PosicaoDiaria[];
 }
 
-export interface DashboardPosicaoResponse {
+export type PanelBase = 'LIQUIDO' | 'BRUTO';
+export type PanelMetrica = 'VALOR' | 'RENTABILIDADE';
+
+export interface Panel {
+  idPanel: number;
+  idUsuario: number;
+  descricao: string;
+  base: PanelBase;
+  metrica: PanelMetrica;
+  filtroTransacoes: boolean;
+  idsTransacao: number[];
+}
+
+export interface PanelCreate {
+  idUsuario: number;
+  descricao: string;
+}
+
+export interface PanelUpdate {
+  descricao: string;
+  base: PanelBase;
+  metrica: PanelMetrica;
+  filtroTransacoes: boolean;
+  idsTransacao: number[];
+}
+
+export interface PanelPosicaoResponse {
   inicio: string;
   fim: string;
   investimentos: InvestimentoSerie[];

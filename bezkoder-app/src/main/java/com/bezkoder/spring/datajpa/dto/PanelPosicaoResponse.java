@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class DashboardPosicaoResponse {
+public class PanelPosicaoResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate inicio;
@@ -16,10 +16,10 @@ public class DashboardPosicaoResponse {
 
     private List<InvestimentoSerieDTO> investimentos = new ArrayList<InvestimentoSerieDTO>();
 
-    public DashboardPosicaoResponse() {
+    public PanelPosicaoResponse() {
     }
 
-    public DashboardPosicaoResponse(LocalDate inicio, LocalDate fim, List<InvestimentoSerieDTO> investimentos) {
+    public PanelPosicaoResponse(LocalDate inicio, LocalDate fim, List<InvestimentoSerieDTO> investimentos) {
         this.inicio = inicio;
         this.fim = fim;
         this.investimentos = investimentos;

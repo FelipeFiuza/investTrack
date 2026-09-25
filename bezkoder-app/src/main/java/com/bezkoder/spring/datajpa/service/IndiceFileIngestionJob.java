@@ -165,7 +165,7 @@ public class IndiceFileIngestionJob implements CommandLineRunner {
             }
 
             String specificationCode = safeSubstring(line, 39, 49).trim();
-            if (!specificationCode.startsWith("ON") && !specificationCode.startsWith("PN")) {
+            if (!specificationCode.startsWith("ON") && !specificationCode.startsWith("PN") && !specificationCode.startsWith("CI")) {
                 return null;
             }
 

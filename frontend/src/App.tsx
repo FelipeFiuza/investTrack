@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import PanelPage from './pages/PanelPage';
 import TransacaoFormPage from './pages/TransacaoFormPage';
 import TransacoesListPage from './pages/TransacoesListPage';
 import UploadPage from './pages/UploadPage';
@@ -14,6 +15,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/panel" element={<PanelPage />} />
+          <Route path="/panel/:id" element={<PanelPage />} />
           <Route path="/transactions" element={<TransacoesListPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/transacao" element={<TransacaoFormPage />} />

@@ -29,6 +29,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             Dashboard
           </Link>
           <Link
+            to="/panel"
+            className={`side-menu-item ${location.pathname.startsWith('/panel') ? 'active' : ''}`}
+          >
+            Panel
+          </Link>
+          <Link
             to="/transactions"
             className={`side-menu-item ${
               location.pathname === '/transactions' || location.pathname.startsWith('/transacao')

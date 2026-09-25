@@ -18,6 +18,7 @@ import com.bezkoder.spring.datajpa.model.Transacao;
 import com.bezkoder.spring.datajpa.repository.TipoInvestimentoRepository;
 import com.bezkoder.spring.datajpa.repository.UsuarioRepository;
 import com.bezkoder.spring.datajpa.repository.TransacaoRepository;
+import com.bezkoder.spring.datajpa.service.PanelService;
 import com.bezkoder.spring.datajpa.service.TransacaoImportService;
 
 @CrossOrigin(origins = "*")
@@ -36,6 +37,9 @@ public class TransacaoController {
 
     @Autowired
     private TransacaoImportService transacaoImportService;
+
+    @Autowired
+    private PanelService panelService;
 
     @GetMapping
     public ResponseEntity<List<TransacaoDTO>> getAll(@RequestParam(defaultValue = "1") Long idUsuario) {
@@ -136,6 +140,7 @@ public class TransacaoController {
             if (!transacaoRepository.existsById(id)) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+            panelService.unlinkTransacao(id);
             transacaoRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {

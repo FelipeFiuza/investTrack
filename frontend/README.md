@@ -1,98 +1,189 @@
-# InvestTrack Frontend
+# InvestTrack
 
-A React TypeScript frontend for the InvestTrack investment portfolio tracking application.
+Aplicação para acompanhar uma **carteira de investimentos** focada em **ações da B3** e **renda fixa**. O produto combina uma API com histórico de fechamentos de mercado e um frontend React personalizável para visualizar posição, rentabilidade e movimentações.
 
-## Features
+## O que o produto faz
 
-- **Login Page**: Simple authentication with email and password
-- **Dashboard**: Interactive line chart showing investment performance over time
-- **Transaction Form**: Add new investment transactions
-- **Responsive Design**: Works on desktop and mobile devices
-- **Modern UI**: Clean, professional interface with gradient color scheme
+- Consolida compras e vendas da carteira (digitadas ou importadas do extrato B3).
+- Cruza cada ativo com a série de **preços de fechamento** (ações via arquivos COTAHIST; renda fixa via tabela própria).
+- Calcula, dia a dia, quantidade, custo médio, valor de mercado e variação — bruta ou líquida de taxas.
+- Exibe o resultado em um panel com período, métrica e transações configuráveis.
 
-## Technology Stack
+Não é um home broker: o objetivo é **acompanhar o que você já possui**, não executar ordens.
 
-- React 18 with TypeScript
-- React Router for navigation
-- Recharts for data visualization
-- Axios for API communication
-- CSS3 with custom properties and gradients
+## Arquitetura
 
-## Getting Started
+O sistema é um monolito de dados com frontend desacoplado. Três camadas se comunicam por HTTP/JSON.
 
-### Prerequisites
-
-- Node.js (version 16 or higher)
-- npm or yarn package manager
-
-### Installation
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-## Project Structure
-
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  Frontend (React 18 + TypeScript)                           │
+│  CRA · React Router · Axios · Recharts · xlsx               │
+│  http://localhost:3000                                      │
+└────────────────────────────┬────────────────────────────────┘
+                             │ REST  /api/*
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│  API (Spring Boot 2.2 · Java 8 · JPA)                       │
+│  Controllers → Services → Repositories                      │
+│  http://localhost:6868                                      │
+└──────────────┬──────────────────────────────┬───────────────┘
+               │ JDBC                         │ CALL get_posicao_diaria
+               ▼                              ▼
+┌──────────────────────────┐    ┌─────────────────────────────┐
+│  MySQL 5.7               │    │  Stored procedure           │
+│  transacao               │    │  posição diária por ativo   │
+│  tipo_investimento       │    └─────────────────────────────┘
+│  indice                  │
+│  apuracao_indice         │  ← fechamentos B3 (COTAHIST)
+│  apuracao_indice_fixa    │  ← curva de renda fixa
+└──────────────────────────┘
 ```
-src/
-├── components/          # Reusable UI components
-├── pages/             # Page components
+
+### Papel de cada parte
+
+| Camada | Responsabilidade |
+| --- | --- |
+| **Frontend** | Interface, rotas, importação B3 no browser, filtros do gráfico e formatação em BRL. Não calcula preço de mercado. |
+| **API** | CRUD de usuários, transações, índices e apurações. Importa lote de trades. Expõe a série do panel. |
+| **Ingestão COTAHIST** | No startup, lê arquivos `data/COTAHIST_A*.TXT` e grava abertura/máximo/mínimo/fechamento em `apuracao_indice`. |
+| **Procedure `get_posicao_diaria`** | Recalcula a posição de um ativo no intervalo: aplica transações em ordem, busca o fechamento do dia (ações ou fallback de renda fixa) e devolve valor bruto/líquido e variação. |
+
+O frontend aponta para `http://localhost:6868/api` (`src/services/api.ts`). A API e o MySQL sobem juntos com Docker Compose na raiz do repositório.
+
+## Domínio
+
+```text
+Usuario 1──* Transacao *──1 TipoInvestimento ──1 Indice
+                                              │
+                         ApuracaoIndice ──────┤  (ações / índices B3)
+                         ApuracaoIndiceFixa ──┘  (renda fixa)
+```
+
+- **TipoInvestimento** — papel, CDB, Tesouro etc. Leva flags de IOF/IR e aponta para o índice de preço usado na marcação.
+- **Indice** — ticker ou índice de correção (`tipo_indice` distingue a família do ativo).
+- **ApuracaoIndice** — série diária de mercado (COTAHIST): abertura, máximos, mínimos e **fechamento**.
+- **ApuracaoIndiceFixa** — série de fechamento para renda fixa, usada quando não há cotação B3.
+- **Transacao** — compra (`buy`) ou venda (`sell`), com data, instituição, quantidade, valor unitário/total e taxas.
+
+A procedure marca a carteira assim:
+
+1. Processa transações até o fim do período (compras sobem quantidade e custo médio; vendas só baixam quantidade).
+2. Para cada dia, lê `valor_fechamento` em `apuracao_indice`; se não houver, usa `apuracao_indice_fixa`.
+3. `gross_total_amount = fechamento × quantidade`
+4. `net_total_amount = bruto − taxas acumuladas`
+5. Variação bruta/líquida em relação ao custo médio.
+
+Transações anteriores ao início do gráfico entram no saldo de abertura, mas não geram pontos.
+
+## Frontend: telas e personalização
+
+SPA Create React App. Rotas em `src/App.tsx`, layout com menu em `AppLayout`.
+
+| Rota | Tela | Função |
+| --- | --- | --- |
+| `/login` | Login | Sessão simplificada em `localStorage` (usuário demo). |
+| `/panel` | Panel | Gráfico da carteira, período, base bruta/líquida, valor vs rentabilidade, seleção de transações. |
+| `/transactions` | Lista | CRUD visual das transações. |
+| `/transacao` e `/transacao/:id` | Formulário | Inclusão/edição manual (ações ou renda fixa). |
+| `/upload` | Upload B3 | Lê `.xlsx` da B3 no browser (`xlsx` + `utils/b3Import.ts`) e envia o lote para `/transacoes/import`. |
+
+### Como o panel é montado
+
+1. `panelApi.get` carrega a configuração salva (base, métrica e transações). Se o usuário ainda não tem panel, a API cria um com base líquida e métrica de valor.
+2. `panelApi.getPosicoes(usuario, inicio, fim, idsExcluidos)` busca as séries.
+3. `buildChartData` agrega as posições diárias no cliente (carteira + cada ativo).
+4. O usuário escolhe **Base** (bruto/líquido), **Métrica** (valor/rentabilidade) e o intervalo (até 60 meses). Base e métrica são gravadas com `panelApi.update`.
+5. **Selecionar transações** abre um popup: desmarcar uma compra também desmarca vendas do mesmo ativo que deixariam saldo negativo (`utils/transactionSelection.ts`). A seleção é persistida no panel; os IDs excluídos voltam na query do gráfico.
+
+### Onde personalizar a UI
+
+O visual foi pensado para ser ajustado sem reescrever regras de negócio.
+
+| O quê | Onde |
+| --- | --- |
+| Paleta, botões, inputs | Variáveis `:root` e classes globais em `src/App.css` |
+| Layout do menu | `src/components/AppLayout.css` |
+| Panel, gráfico, modal | `PanelPage.css`, `SelecionarTransacoesModal.css` |
+| Cores das séries do gráfico | `SERIES_COLORS` em `PanelPage.tsx` |
+| Tipos e contratos da API | `src/types/index.ts` |
+| Cliente HTTP | `src/services/api.ts` (`API_BASE_URL`) |
+| Parser do extrato B3 | `src/utils/b3Import.ts` |
+
+Especificidade CSS: classes de página (ex.: `.chart-control .btn.select-tx-btn`) precisam ser mais específicas que `.btn` / `.btn-secondary` de `App.css`, porque o global é injetado depois no bundle.
+
+### Estrutura de pastas
+
+```text
+frontend/src/
+├── App.tsx                 # rotas
+├── App.css                 # tema global
+├── components/
+│   ├── AppLayout.tsx       # shell (menu + conteúdo)
+│   └── SelecionarTransacoesModal.tsx
+├── pages/
 │   ├── LoginPage.tsx
-│   ├── DashboardPage.tsx
-│   └── TransacaoFormPage.tsx
-├── services/          # API service layer
-│   └── api.ts
-├── types/            # TypeScript type definitions
-│   └── index.ts
-├── App.tsx           # Main app component
-├── App.css           # Global styles
-├── index.tsx         # App entry point
-└── index.css         # Base styles
+│   ├── PanelPage.tsx
+│   ├── TransacoesListPage.tsx
+│   ├── TransacaoFormPage.tsx
+│   └── UploadPage.tsx
+├── services/api.ts         # Axios → Spring
+├── types/index.ts
+└── utils/
+    ├── b3Import.ts
+    └── transactionSelection.ts
 ```
 
-## API Integration
+## API de fechamentos e carteira
 
-The frontend is configured to communicate with the Spring Boot backend running on `http://localhost:8081`. The API endpoints include:
+Base: `http://localhost:6868/api`. CORS liberado para o frontend.
 
-- `/api/usuarios` - User management
-- `/api/transacoes` - Transaction management (to be implemented)
-- `/api/apuracoes-indice` - Index calculations
-- `/api/tipos-investimento` - Investment types
-- `/api/indices` - Market indices
+| Recurso | Uso |
+| --- | --- |
+| `GET /panel` e `PUT /panel/{id}` | Configuração do panel: base, métrica e transações selecionadas. `GET` recebe `idUsuario` e cria o registro se ainda não existir. |
+| `GET /panel/posicoes` | Série do gráfico. Query: `idUsuario`, `inicio`, `fim`, `idsExcluidos` (IDs separados por vírgula). |
+| `GET/POST/PUT/DELETE /transacoes` | Movimentações da carteira. |
+| `POST /transacoes/import` | Lote vindo do upload B3 (ticker → tipo de investimento). |
+| `GET /apuracoes-indice` | Fechamentos (e demais OHLC) por período ou por índice. |
+| `GET /indices` | Cadastro de índices / tickers (`tipoIndice` filtra a família). |
+| `GET /tipos-investimento` | Ativos da carteira (ações e renda fixa). |
+| `GET/POST /usuarios` | Usuário da sessão. |
 
-## Color Palette
+A ingestão COTAHIST (`IndiceFileIngestionJob`) roda na subida da API e preenche `apuracao_indice`. Renda fixa permanece em `apuracao_indice_fixa` para o fallback da procedure.
 
-The application uses a modern gradient color scheme:
-- Primary: #667eea (Blue)
-- Secondary: #764ba2 (Purple)
-- Accent: #f093fb (Pink)
-- Text: #2d3748 (Dark Gray)
-- Background: #f7fafc (Light Gray)
+## Como rodar
 
-## Available Scripts
+### API e banco (raiz do repositório)
 
-- `npm start` - Runs the app in development mode
-- `npm build` - Builds the app for production
-- `npm test` - Launches the test runner
-- `npm eject` - Ejects from Create React App (one-way operation)
+```bash
+docker compose up
+```
 
-## Development Notes
+MySQL na porta `3307`, API na `6868` (ver `.env`).
 
-- The app uses mock data for the dashboard chart as specified
-- Authentication is simplified for demo purposes
-- The transaction form includes all fields from the Transacao entity
-- Responsive design ensures compatibility with mobile devices
-- All forms include proper validation and error handling
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Abre [http://localhost:3000](http://localhost:3000). Alternativa: `./start.sh`.
+
+Requisitos: Node.js 16+.
+
+### Scripts
+
+| Comando | Efeito |
+| --- | --- |
+| `npm start` | Dev server com hot reload |
+| `npm run build` | Build de produção |
+| `npm test` | Test runner do CRA |
+
+## Stack
+
+- **UI:** React 18, TypeScript, React Router 6, Recharts, Axios, SheetJS (`xlsx`)
+- **API:** Spring Boot, Spring Data JPA, stored procedure MySQL
+- **Dados de mercado:** COTAHIST (B3) + apurações de renda fixa
+- **Infra:** Docker Compose (MySQL 5.7 + app Java)
