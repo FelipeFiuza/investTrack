@@ -1,26 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import PanelChart from '../components/PanelChart';
-import { panelApi } from '../services/api';
-import { Panel } from '../types';
+import { dashboardApi, panelApi } from '../services/api';
+import { Dashboard, Panel } from '../types';
+import { buildDashboardRegions, emptySlots, SlotId, SlotMap } from '../utils/dashboardLayout';
 import './DashboardPage.css';
-
-type SlotId = 'tl' | 'tr' | 'bl' | 'br';
-
-const SLOTS: { id: SlotId; label: string }[] = [
-  { id: 'tl', label: 'Esquerda superior' },
-  { id: 'tr', label: 'Direita superior' },
-  { id: 'bl', label: 'Esquerda inferior' },
-  { id: 'br', label: 'Direita inferior' },
-];
-
-const emptySlots = (): Record<SlotId, number | null> => ({
-  tl: null,
-  tr: null,
-  bl: null,
-  br: null,
-});
 
 const getUserId = (): number => {
   try {
@@ -35,36 +20,106 @@ const getUserId = (): number => {
 
 const storageKey = (userId: number): string => `investtrack-dashboard-${userId}`;
 
-const loadSlots = (userId: number): Record<SlotId, number | null> => {
+const loadLocalSlots = (userId: number): SlotMap => {
   try {
     const raw = localStorage.getItem(storageKey(userId));
     if (!raw) return emptySlots();
-    const parsed = JSON.parse(raw) as Partial<Record<SlotId, number | null>>;
+    const parsed = JSON.parse(raw) as Partial<SlotMap>;
     return { ...emptySlots(), ...parsed };
   } catch {
     return emptySlots();
   }
 };
 
+const slotsFromDashboard = (dashboard: Dashboard): SlotMap => ({
+  tl: dashboard.idPanelEsquerdaSuperior,
+  tr: dashboard.idPanelDireitaSuperior,
+  bl: dashboard.idPanelEsquerdaInferior,
+  br: dashboard.idPanelDireitaInferior,
+});
+
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const userId = getUserId();
-  const [slots, setSlots] = useState<Record<SlotId, number | null>>(() => loadSlots(userId));
-  const [editing, setEditing] = useState<Record<SlotId, boolean>>({
-    tl: false,
-    tr: false,
-    bl: false,
-    br: false,
-  });
+  const [dashboardId, setDashboardId] = useState<number | null>(null);
+  const [descricao, setDescricao] = useState('Dashboard');
+  const [slots, setSlots] = useState<SlotMap>(emptySlots);
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
   const [pickerSlot, setPickerSlot] = useState<SlotId | null>(null);
   const [panels, setPanels] = useState<Panel[]>([]);
   const [loadingPanels, setLoadingPanels] = useState(false);
   const [pickerError, setPickerError] = useState<string | null>(null);
   const [novaDescricao, setNovaDescricao] = useState('');
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const readyToSave = useRef(false);
 
   useEffect(() => {
-    localStorage.setItem(storageKey(userId), JSON.stringify(slots));
-  }, [slots, userId]);
+    let cancelled = false;
+    const load = async () => {
+      readyToSave.current = false;
+      setLoadError(null);
+      try {
+        const res = await dashboardApi.list(userId);
+        const existing = (res.data || [])[0];
+        let dashboard = existing;
+        if (!dashboard) {
+          const local = loadLocalSlots(userId);
+          const payload = {
+            idUsuario: userId,
+            descricao: 'Dashboard',
+            idPanelEsquerdaSuperior: local.tl,
+            idPanelDireitaSuperior: local.tr,
+            idPanelEsquerdaInferior: local.bl,
+            idPanelDireitaInferior: local.br,
+          };
+          try {
+            dashboard = (await dashboardApi.create(payload)).data;
+          } catch {
+            dashboard = (
+              await dashboardApi.create({
+                ...payload,
+                idPanelEsquerdaSuperior: null,
+                idPanelDireitaSuperior: null,
+                idPanelEsquerdaInferior: null,
+                idPanelDireitaInferior: null,
+              })
+            ).data;
+          }
+        }
+        if (cancelled) return;
+        localStorage.removeItem(storageKey(userId));
+        setDashboardId(dashboard.idDashboard);
+        setDescricao(dashboard.descricao || 'Dashboard');
+        setSlots(slotsFromDashboard(dashboard));
+        readyToSave.current = true;
+      } catch {
+        if (!cancelled) {
+          setLoadError('Não foi possível carregar o dashboard.');
+        }
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!readyToSave.current || dashboardId == null) return;
+    const handle = window.setTimeout(() => {
+      dashboardApi
+        .update(dashboardId, {
+          idUsuario: userId,
+          descricao,
+          idPanelEsquerdaSuperior: slots.tl,
+          idPanelDireitaSuperior: slots.tr,
+          idPanelEsquerdaInferior: slots.bl,
+          idPanelDireitaInferior: slots.br,
+        })
+        .catch(() => setLoadError('Não foi possível salvar o dashboard.'));
+    }, 300);
+    return () => window.clearTimeout(handle);
+  }, [dashboardId, descricao, slots, userId]);
 
   const openPicker = async (slot: SlotId) => {
     setPickerSlot(slot);
@@ -88,6 +143,23 @@ const DashboardPage: React.FC = () => {
     setPickerSlot(null);
   };
 
+  const closeRegion = (regionSlots: SlotId[]) => {
+    setSlots((prev) => {
+      const next = { ...prev };
+      regionSlots.forEach((slot) => {
+        next[slot] = null;
+      });
+      return next;
+    });
+    setEditing((prev) => {
+      const next = { ...prev };
+      regionSlots.forEach((slot) => {
+        next[slot] = false;
+      });
+      return next;
+    });
+  };
+
   const createAndAssign = async () => {
     if (!pickerSlot) return;
     setPickerError(null);
@@ -103,64 +175,105 @@ const DashboardPage: React.FC = () => {
     }
   };
 
+  const regions = buildDashboardRegions(slots);
+
   return (
     <AppLayout>
-      <div className="dashboard-board">
-        {SLOTS.map((slot) => {
-          const panelId = slots[slot.id];
-          const isEditing = editing[slot.id];
-          return (
-            <section key={slot.id} className="dashboard-slot" aria-label={slot.label}>
-              {panelId == null ? (
-                <button
-                  type="button"
-                  className="dashboard-placeholder"
-                  onClick={() => openPicker(slot.id)}
-                  aria-label={`Adicionar panel em ${slot.label}`}
-                >
-                  +
-                </button>
-              ) : (
-                <>
-                  <div className="slot-actions">
-                    <button
-                      type="button"
-                      className={`slot-action${isEditing ? ' active' : ''}`}
-                      onClick={() =>
-                        setEditing((prev) => ({ ...prev, [slot.id]: !prev[slot.id] }))
-                      }
-                      aria-label="Editar panel"
-                      title="Editar"
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      className="slot-action"
-                      onClick={() => navigate(`/panel/${panelId}`)}
-                      aria-label="Abrir panel"
-                      title="Abrir panel"
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
-                      </svg>
-                    </button>
-                  </div>
-                  <PanelChart
-                    panelId={panelId}
-                    mode={isEditing ? 'edit' : 'display'}
-                    embedded
-                  />
-                </>
-              )}
-            </section>
-          );
-        })}
+      <div className="dashboard-page">
+        <div className="dashboard-toolbar">
+          <input
+            className="dashboard-title"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            aria-label="Descrição do dashboard"
+          />
+          {loadError && <p className="dashboard-error">{loadError}</p>}
+        </div>
+        <div className="dashboard-board">
+          {regions.map((region) => {
+            const anchor = region.slots[0];
+            const isEditing = Boolean(editing[anchor]);
+            return (
+              <section
+                key={region.id}
+                className="dashboard-slot"
+                style={{ gridColumn: region.gridColumn, gridRow: region.gridRow }}
+                aria-label={region.label}
+              >
+                {region.panelId == null ? (
+                  <button
+                    type="button"
+                    className="dashboard-placeholder"
+                    onClick={() => openPicker(anchor)}
+                    aria-label={`Adicionar panel em ${region.label}`}
+                  >
+                    +
+                  </button>
+                ) : (
+                  <>
+                    <div className="slot-actions">
+                      <button
+                        type="button"
+                        className={`slot-action${isEditing ? ' active' : ''}`}
+                        onClick={() =>
+                          setEditing((prev) => ({ ...prev, [anchor]: !prev[anchor] }))
+                        }
+                        aria-label="Editar panel"
+                        title="Editar"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="slot-action"
+                        onClick={() => navigate(`/panel/${region.panelId}`)}
+                        aria-label="Abrir panel"
+                        title="Abrir panel"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <rect
+                            x="4"
+                            y="5"
+                            width="16"
+                            height="14"
+                            rx="2"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="slot-action"
+                        onClick={() => closeRegion(region.slots)}
+                        aria-label="Fechar panel"
+                        title="Fechar"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <PanelChart
+                      panelId={region.panelId}
+                      mode={isEditing ? 'edit' : 'display'}
+                      embedded
+                    />
+                  </>
+                )}
+              </section>
+            );
+          })}
+        </div>
       </div>
 
       {pickerSlot && (

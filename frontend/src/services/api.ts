@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Usuario, UsuarioCreateDTO, Transacao, TransacaoCreateDTO, TransacaoImportRequest, ApuracaoIndice, TipoInvestimento, Indice, Panel, PanelCreate, PanelPosicaoResponse, PanelUpdate } from '../types';
+import { Usuario, UsuarioCreateDTO, Transacao, TransacaoCreateDTO, TransacaoImportRequest, ApuracaoIndice, TipoInvestimento, Indice, Panel, PanelCreate, PanelPosicaoResponse, PanelUpdate, Dashboard, DashboardWrite } from '../types';
 
 const API_BASE_URL = 'http://localhost:6868/api';
 
@@ -48,6 +48,13 @@ export const indiceApi = {
   getAll: (descricao?: string, tipoIndice?: string) => 
     api.get<Indice[]>(`/indices${descricao || tipoIndice ? `?descricao=${descricao}&tipoIndice=${tipoIndice}` : ''}`),
   getById: (id: number) => api.get<Indice>(`/indices/${id}`),
+};
+
+export const dashboardApi = {
+  list: (idUsuario: number) => api.get<Dashboard[]>('/dashboard', { params: { idUsuario } }),
+  getById: (id: number) => api.get<Dashboard>(`/dashboard/${id}`),
+  create: (data: DashboardWrite) => api.post<Dashboard>('/dashboard', data),
+  update: (id: number, data: DashboardWrite) => api.put<Dashboard>(`/dashboard/${id}`, data),
 };
 
 export const panelApi = {

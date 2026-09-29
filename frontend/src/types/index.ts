@@ -123,3 +123,22 @@ export interface PanelPosicaoResponse {
   fim: string;
   investimentos: InvestimentoSerie[];
 }
+
+export interface Dashboard {
+  idDashboard: number;
+  idUsuario: number;
+  descricao: string;
+  idPanelEsquerdaSuperior: number | null;
+  idPanelDireitaSuperior: number | null;
+  idPanelEsquerdaInferior: number | null;
+  idPanelDireitaInferior: number | null;
+}
+
+export interface DashboardWrite {
+  idUsuario: number;
+  descricao: string;
+  idPanelEsquerdaSuperior: number | null;
+  idPanelDireitaSuperior: number | null;
+  idPanelEsquerdaInferior: number | null;
+  idPanelDireitaInferior: number | null;
+}
