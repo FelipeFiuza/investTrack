@@ -77,10 +77,11 @@ public class PanelService {
 
     @Transactional
     public List<PanelDTO> listByUsuario(Long idUsuario) {
+        int totalTransacoes = (int) transacaoRepository.countByUsuario_IdUsuario(idUsuario);
         List<PanelDTO> result = new ArrayList<PanelDTO>();
         List<Panel> panels = panelRepository.findByUsuario_IdUsuarioOrderByIdPanelAsc(idUsuario);
         for (Panel panel : panels) {
-            result.add(toDto(panel));
+            result.add(toDto(panel, totalTransacoes));
         }
         return result;
     }
@@ -88,7 +89,12 @@ public class PanelService {
     @Transactional
     public PanelDTO getById(Long id) {
         Panel panel = panelRepository.findById(id).orElse(null);
-        return panel == null ? null : toDto(panel);
+        if (panel == null) {
+            return null;
+        }
+        Long idUsuario = panel.getUsuario() != null ? panel.getUsuario().getIdUsuario() : null;
+        int totalTransacoes = idUsuario == null ? 0 : (int) transacaoRepository.countByUsuario_IdUsuario(idUsuario);
+        return toDto(panel, totalTransacoes);
     }
 
     @Transactional
@@ -102,11 +108,13 @@ public class PanelService {
         }
         Panel panel = new Panel();
         panel.setUsuario(usuario);
-        panel.setDescricao(normalizeDescricao(dto.getDescricao()));
-        panel.setBase(Base.LIQUIDO);
+        panel.setDescricao("Novo Painel");
+        panel.setBase(Base.BRUTO);
         panel.setMetrica(Metrica.VALOR);
         panel.setFiltroTransacoes(false);
-        return toDto(panelRepository.save(panel));
+        Panel saved = panelRepository.save(panel);
+        int totalTransacoes = (int) transacaoRepository.countByUsuario_IdUsuario(dto.getIdUsuario());
+        return toDto(saved, totalTransacoes);
     }
 
     @Transactional
@@ -136,7 +144,10 @@ public class PanelService {
         if (dto.isFiltroTransacoes()) {
             panel.getTransacoes().addAll(transacoesDoUsuario(panel, dto.getIdsTransacao()));
         }
-        return toDto(panelRepository.save(panel));
+        Panel saved = panelRepository.save(panel);
+        Long idUsuario = saved.getUsuario() != null ? saved.getUsuario().getIdUsuario() : null;
+        int totalTransacoes = idUsuario == null ? 0 : (int) transacaoRepository.countByUsuario_IdUsuario(idUsuario);
+        return toDto(saved, totalTransacoes);
     }
 
     public PanelPosicaoResponse getPosicoes(Long idUsuario, LocalDate inicio, LocalDate fim,
@@ -179,13 +190,6 @@ public class PanelService {
         return new PanelPosicaoResponse(inicio, fim, series);
     }
 
-    private String normalizeDescricao(String descricao) {
-        if (descricao == null || descricao.trim().isEmpty()) {
-            return "Novo panel";
-        }
-        return descricao.trim();
-    }
-
     private Set<Transacao> transacoesDoUsuario(Panel panel, List<Long> ids) {
         Set<Transacao> selected = new HashSet<Transacao>();
         if (ids == null || ids.isEmpty() || panel.getUsuario() == null) {
@@ -207,7 +211,7 @@ public class PanelService {
         return selected;
     }
 
-    private PanelDTO toDto(Panel panel) {
+    private PanelDTO toDto(Panel panel, int totalTransacoesUsuario) {
         PanelDTO dto = new PanelDTO();
         dto.setIdPanel(panel.getIdPanel());
         dto.setIdUsuario(panel.getUsuario() != null ? panel.getUsuario().getIdUsuario() : null);
@@ -224,6 +228,7 @@ public class PanelService {
             }
         }
         dto.setIdsTransacao(ids);
+        dto.setQuantidadeTransacoes(panel.isFiltroTransacoes() ? ids.size() : totalTransacoesUsuario);
         return dto;
     }
 

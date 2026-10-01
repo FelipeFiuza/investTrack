@@ -30,18 +30,18 @@ public class Panel {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @Column(name = "descricao", length = 120)
-    private String descricao;
+    @Column(name = "descricao", columnDefinition = "varchar(120) default 'Novo Painel'")
+    private String descricao = "Novo Painel";
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "base", nullable = false, length = 20)
-    private Base base = Base.LIQUIDO;
+    @Column(name = "base", nullable = false, columnDefinition = "varchar(20) not null default 'BRUTO'")
+    private Base base = Base.BRUTO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "metrica", nullable = false, length = 20)
+    @Column(name = "metrica", nullable = false, columnDefinition = "varchar(20) not null default 'VALOR'")
     private Metrica metrica = Metrica.VALOR;
 
-    @Column(name = "filtro_transacoes", nullable = false)
+    @Column(name = "filtro_transacoes", nullable = false, columnDefinition = "bit(1) not null default 0")
     private boolean filtroTransacoes = false;
 
     @ManyToMany(fetch = FetchType.LAZY)

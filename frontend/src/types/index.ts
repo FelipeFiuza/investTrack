@@ -102,6 +102,7 @@ export interface Panel {
   base: PanelBase;
   metrica: PanelMetrica;
   filtroTransacoes: boolean;
+  quantidadeTransacoes: number;
   idsTransacao: number[];
 }
 

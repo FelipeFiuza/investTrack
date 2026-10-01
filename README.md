@@ -7,7 +7,7 @@ Aplicação para acompanhar uma **carteira de investimentos** focada em **açõe
 - Consolida compras e vendas da carteira (digitadas ou importadas do extrato B3).
 - Cruza cada ativo com a série de **preços de fechamento** (ações via arquivos COTAHIST; renda fixa via tabela própria).
 - Calcula, dia a dia, quantidade, custo médio, valor de mercado e variação — bruta ou líquida de taxas.
-- Exibe o resultado em um dashboard com período, métrica e transações configuráveis.
+- Exibe o resultado em um panel com período, métrica e transações configuráveis.
 
 Não é um home broker: o objetivo é **acompanhar o que você já possui**, não executar ordens.
 
@@ -45,7 +45,7 @@ O sistema é um monolito de dados com frontend desacoplado. Três camadas se com
 | Camada | Responsabilidade |
 | --- | --- |
 | **Frontend** | Interface, rotas, importação B3 no browser, filtros do gráfico e formatação em BRL. Não calcula preço de mercado. |
-| **API** | CRUD de usuários, transações, índices e apurações. Importa lote de trades. Expõe a série do dashboard. |
+| **API** | CRUD de usuários, transações, índices e apurações. Importa lote de trades. Expõe a série do panel. |
 | **Ingestão COTAHIST** | No startup, lê arquivos `data/COTAHIST_A*.TXT` e grava abertura/máximo/mínimo/fechamento em `apuracao_indice`. |
 | **Procedure `get_posicao_diaria`** | Recalcula a posição de um ativo no intervalo: aplica transações em ordem, busca o fechamento do dia (ações ou fallback de renda fixa) e devolve valor bruto/líquido e variação. |
 
@@ -83,17 +83,18 @@ SPA Create React App. Rotas em `src/App.tsx`, layout com menu em `AppLayout`.
 | Rota | Tela | Função |
 | --- | --- | --- |
 | `/login` | Login | Sessão simplificada em `localStorage` (usuário demo). |
-| `/dashboard` | Dashboard | Gráfico da carteira, período, base bruta/líquida, valor vs rentabilidade, seleção de transações. |
+| `/panel` | Panel | Gráfico da carteira, período, base bruta/líquida, valor vs rentabilidade, seleção de transações. |
 | `/transactions` | Lista | CRUD visual das transações. |
 | `/transacao` e `/transacao/:id` | Formulário | Inclusão/edição manual (ações ou renda fixa). |
 | `/upload` | Upload B3 | Lê `.xlsx` da B3 no browser (`xlsx` + `utils/b3Import.ts`) e envia o lote para `/transacoes/import`. |
 
-### Como o dashboard é montado
+### Como o panel é montado
 
-1. `dashboardApi.getPosicoes(usuario, inicio, fim, idsExcluidos)` busca as séries.
-2. `buildChartData` agrega as posições diárias no cliente (carteira + cada ativo).
-3. O usuário escolhe **Base** (bruto/líquido), **Métrica** (valor/rentabilidade) e o intervalo (até 60 meses).
-4. **Selecionar transações** abre um popup: desmarcar uma compra também desmarca vendas do mesmo ativo que deixariam saldo negativo (`utils/transactionSelection.ts`). Os IDs excluídos voltam na query do gráfico.
+1. `panelApi.get` carrega a configuração salva (base, métrica e transações). Se o usuário ainda não tem panel, a API cria um com base líquida e métrica de valor.
+2. `panelApi.getPosicoes(usuario, inicio, fim, idsExcluidos)` busca as séries.
+3. `buildChartData` agrega as posições diárias no cliente (carteira + cada ativo).
+4. O usuário escolhe **Base** (bruto/líquido), **Métrica** (valor/rentabilidade) e o intervalo (até 60 meses). Base e métrica são gravadas com `panelApi.update`.
+5. **Selecionar transações** abre um popup: desmarcar uma compra também desmarca vendas do mesmo ativo que deixariam saldo negativo (`utils/transactionSelection.ts`). A seleção é persistida no panel; os IDs excluídos voltam na query do gráfico.
 
 ### Onde personalizar a UI
 
@@ -103,8 +104,8 @@ O visual foi pensado para ser ajustado sem reescrever regras de negócio.
 | --- | --- |
 | Paleta, botões, inputs | Variáveis `:root` e classes globais em `src/App.css` |
 | Layout do menu | `src/components/AppLayout.css` |
-| Dashboard, gráfico, modal | `DashboardPage.css`, `SelecionarTransacoesModal.css` |
-| Cores das séries do gráfico | `SERIES_COLORS` em `DashboardPage.tsx` |
+| Panel, gráfico, modal | `PanelPage.css`, `SelecionarTransacoesModal.css` |
+| Cores das séries do gráfico | `SERIES_COLORS` em `PanelPage.tsx` |
 | Tipos e contratos da API | `src/types/index.ts` |
 | Cliente HTTP | `src/services/api.ts` (`API_BASE_URL`) |
 | Parser do extrato B3 | `src/utils/b3Import.ts` |
@@ -122,7 +123,7 @@ frontend/src/
 │   └── SelecionarTransacoesModal.tsx
 ├── pages/
 │   ├── LoginPage.tsx
-│   ├── DashboardPage.tsx
+│   ├── PanelPage.tsx
 │   ├── TransacoesListPage.tsx
 │   ├── TransacaoFormPage.tsx
 │   └── UploadPage.tsx
@@ -139,7 +140,8 @@ Base: `http://localhost:6868/api`. CORS liberado para o frontend.
 
 | Recurso | Uso |
 | --- | --- |
-| `GET /dashboard/posicoes` | Série do gráfico. Query: `idUsuario`, `inicio`, `fim`, `idsExcluidos` (IDs separados por vírgula). |
+| `GET /panel` e `PUT /panel/{id}` | Configuração do panel: base, métrica e transações selecionadas. `GET` recebe `idUsuario` e cria o registro se ainda não existir. |
+| `GET /panel/posicoes` | Série do gráfico. Query: `idUsuario`, `inicio`, `fim`, `idsExcluidos` (IDs separados por vírgula). |
 | `GET/POST/PUT/DELETE /transacoes` | Movimentações da carteira. |
 | `POST /transacoes/import` | Lote vindo do upload B3 (ticker → tipo de investimento). |
 | `GET /apuracoes-indice` | Fechamentos (e demais OHLC) por período ou por índice. |

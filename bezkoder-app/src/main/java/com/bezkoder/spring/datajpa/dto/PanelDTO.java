@@ -14,6 +14,7 @@ public class PanelDTO {
     private Base base;
     private Metrica metrica;
     private boolean filtroTransacoes;
+    private int quantidadeTransacoes;
     private List<Long> idsTransacao = new ArrayList<Long>();
 
     public Long getIdPanel() {
@@ -62,6 +63,14 @@ public class PanelDTO {
 
     public void setFiltroTransacoes(boolean filtroTransacoes) {
         this.filtroTransacoes = filtroTransacoes;
+    }
+
+    public int getQuantidadeTransacoes() {
+        return quantidadeTransacoes;
+    }
+
+    public void setQuantidadeTransacoes(int quantidadeTransacoes) {
+        this.quantidadeTransacoes = quantidadeTransacoes;
     }
 
     public List<Long> getIdsTransacao() {

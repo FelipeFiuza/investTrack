@@ -49,7 +49,7 @@ const DashboardPage: React.FC = () => {
   const [panels, setPanels] = useState<Panel[]>([]);
   const [loadingPanels, setLoadingPanels] = useState(false);
   const [pickerError, setPickerError] = useState<string | null>(null);
-  const [novaDescricao, setNovaDescricao] = useState('');
+  const [creatingPanel, setCreatingPanel] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const readyToSave = useRef(false);
 
@@ -123,7 +123,6 @@ const DashboardPage: React.FC = () => {
 
   const openPicker = async (slot: SlotId) => {
     setPickerSlot(slot);
-    setNovaDescricao('');
     setPickerError(null);
     setLoadingPanels(true);
     try {
@@ -161,17 +160,20 @@ const DashboardPage: React.FC = () => {
   };
 
   const createAndAssign = async () => {
-    if (!pickerSlot) return;
+    if (!pickerSlot || creatingPanel) return;
     setPickerError(null);
+    setCreatingPanel(true);
     try {
       const res = await panelApi.create({
         idUsuario: userId,
-        descricao: novaDescricao.trim() || 'Novo panel',
+        descricao: 'Novo Painel',
       });
       setPanels((prev) => [...prev, res.data]);
       assignPanel(pickerSlot, res.data.idPanel);
     } catch {
       setPickerError('Não foi possível criar o panel.');
+    } finally {
+      setCreatingPanel(false);
     }
   };
 
@@ -294,22 +296,18 @@ const DashboardPage: React.FC = () => {
                 ))}
               </ul>
             )}
-            <label className="picker-create">
-              <span>Novo panel</span>
-              <input
-                className="form-input"
-                value={novaDescricao}
-                onChange={(e) => setNovaDescricao(e.target.value)}
-                placeholder="Descrição"
-              />
-            </label>
             {pickerError && <p className="picker-error">{pickerError}</p>}
             <div className="picker-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setPickerSlot(null)}>
                 Cancelar
               </button>
-              <button type="button" className="btn btn-primary" onClick={createAndAssign}>
-                Criar e exibir
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={createAndAssign}
+                disabled={creatingPanel}
+              >
+                Novo Painel
               </button>
             </div>
           </div>

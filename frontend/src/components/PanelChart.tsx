@@ -243,7 +243,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
   const [data, setData] = useState<PanelPosicaoResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [basis, setBasis] = useState<AmountBasis>('net');
+  const [basis, setBasis] = useState<AmountBasis>('gross');
   const [metric, setMetric] = useState<MetricKind>('value');
   const [startOffset, setStartOffset] = useState(PERIOD_MONTHS_MAX - PERIOD_MONTHS_DEFAULT);
   const [endOffset, setEndOffset] = useState(PERIOD_MONTHS_MAX);
