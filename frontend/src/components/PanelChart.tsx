@@ -624,7 +624,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                         }}
                       />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: 11, lineHeight: '14px' }} iconSize={8} />
                       <Line
                         type="monotone"
                         dataKey={TOTAL_KEY}

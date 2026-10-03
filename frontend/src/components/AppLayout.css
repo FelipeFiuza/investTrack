@@ -6,14 +6,66 @@
 
 .side-menu {
   width: 240px;
+  flex-shrink: 0;
   background: white;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
+  position: relative;
+  transition: width 0.2s ease;
+  overflow: hidden;
+}
+
+.side-menu.collapsed {
+  width: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  z-index: 5;
+}
+
+.side-menu.collapsed .side-menu-header,
+.side-menu.collapsed .side-menu-nav,
+.side-menu.collapsed .side-menu-footer {
+  display: none;
+}
+
+.side-menu-tab {
+  position: absolute;
+  top: 474px;
+  right: 12px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.side-menu.collapsed .side-menu-tab {
+  right: auto;
+  left: 0;
+  top: 474px;
+  width: 18px;
+  height: 56px;
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
+  font-size: 16px;
+}
+
+.side-menu-tab:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .side-menu-header {
-  padding: 24px;
+  padding: 24px 48px 24px 24px;
   border-bottom: 1px solid var(--border-color);
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './AppLayout.css';
 
@@ -9,6 +9,7 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -17,7 +18,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="app-layout">
-      <aside className="side-menu">
+      <aside className={`side-menu${collapsed ? ' collapsed' : ''}`}>
+        <button
+          type="button"
+          className="side-menu-tab"
+          onClick={() => setCollapsed((open) => !open)}
+          aria-label={collapsed ? 'Abrir menu' : 'Recolher menu'}
+          title={collapsed ? 'Abrir menu' : 'Recolher menu'}
+        >
+          {collapsed ? '›' : '‹'}
+        </button>
         <div className="side-menu-header">
           <h2 className="side-menu-title">InvestTrack</h2>
         </div>
