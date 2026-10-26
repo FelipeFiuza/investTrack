@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import { panelApi, transacaoApi } from '../services/api';
-import { InvestimentoSerie, Panel, PanelBase, PanelMetrica, PanelPosicaoResponse, PosicaoDiaria, Transacao } from '../types';
+import { InvestimentoSerie, Panel, PanelBase, PanelExibicaoTransacoes, PanelMetrica, PanelPosicaoResponse, PosicaoDiaria, Transacao } from '../types';
 import SelecionarTransacoesModal from './SelecionarTransacoesModal';
 import {
   allTransactionIds,
@@ -30,12 +30,13 @@ interface PanelChartProps {
 
 type AmountBasis = 'gross' | 'net';
 type MetricKind = 'value' | 'return';
+type TransactionDisplay = 'grouped' | 'individual';
 
 const PERIOD_MONTHS_MAX = 60;
 const PERIOD_MONTHS_DEFAULT = 24;
 const TOTAL_KEY = 'total';
 const SERIES_COLORS = [
-  '#667eea',
+  '#208B46',
   '#48bb78',
   '#ed8936',
   '#f56565',
@@ -238,6 +239,10 @@ const toPanelMetrica = (metric: MetricKind): PanelMetrica =>
 const fromPanelBase = (base: PanelBase): AmountBasis => (base === 'BRUTO' ? 'gross' : 'net');
 const fromPanelMetrica = (metrica: PanelMetrica): MetricKind =>
   metrica === 'RENTABILIDADE' ? 'return' : 'value';
+const toPanelExibicao = (display: TransactionDisplay): PanelExibicaoTransacoes =>
+  display === 'grouped' ? 'AGRUPADA' : 'INDIVIDUAIS';
+const fromPanelExibicao = (exibicao?: PanelExibicaoTransacoes): TransactionDisplay =>
+  exibicao === 'AGRUPADA' ? 'grouped' : 'individual';
 
 const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false }) => {
   const [data, setData] = useState<PanelPosicaoResponse | null>(null);
@@ -245,6 +250,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
   const [error, setError] = useState<string | null>(null);
   const [basis, setBasis] = useState<AmountBasis>('gross');
   const [metric, setMetric] = useState<MetricKind>('value');
+  const [transactionDisplay, setTransactionDisplay] = useState<TransactionDisplay>('individual');
   const [startOffset, setStartOffset] = useState(PERIOD_MONTHS_MAX - PERIOD_MONTHS_DEFAULT);
   const [endOffset, setEndOffset] = useState(PERIOD_MONTHS_MAX);
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
@@ -280,6 +286,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
         setDescricao(panel.descricao || '');
         setBasis(fromPanelBase(panel.base));
         setMetric(fromPanelMetrica(panel.metrica));
+        setTransactionDisplay(fromPanelExibicao(panel.exibicaoTransacoes));
         if (panel.filtroTransacoes) {
           const txRes = await transacaoApi.getAll(getUserId());
           if (cancelled) return;
@@ -317,6 +324,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
           descricao,
           base: toPanelBase(basis),
           metrica: toPanelMetrica(metric),
+          exibicaoTransacoes: toPanelExibicao(transactionDisplay),
           filtroTransacoes: selectedIds !== null,
           idsTransacao,
         })
@@ -325,7 +333,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
         });
     }, 350);
     return () => window.clearTimeout(handle);
-  }, [configReady, panelId, basis, metric, selectedKey, selectedIds, descricao]);
+  }, [configReady, panelId, basis, metric, transactionDisplay, selectedKey, selectedIds, descricao]);
 
   useEffect(() => {
     if (!configReady) return;
@@ -472,7 +480,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
           <div className="panel-grid">
             <div className="chart-card">
               <div className="card-header">
-                <div>
+                <div className="card-header-main">
                   {editing ? (
                     <label className="chart-control panel-description">
                       <span>Descrição</span>
@@ -487,11 +495,21 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                   ) : (
                     <h2 className="card-title">{descricao || 'Panel'}</h2>
                   )}
-                  <p className="card-subtitle">
-                    {formatMonthLabel(dateFromOffset(Math.min(startOffset, endOffset), false))} até{' '}
-                    {formatMonthLabel(dateFromOffset(Math.max(startOffset, endOffset), true))}
-                  </p>
                 </div>
+                {editing && (
+                  <label className="chart-control panel-description">
+                    <span>Exibição das transações</span>
+                    <select
+                      className="form-select"
+                      value={transactionDisplay}
+                      disabled={!configReady}
+                      onChange={(e) => setTransactionDisplay(e.target.value as TransactionDisplay)}
+                    >
+                      <option value="individual">Individuais</option>
+                      <option value="grouped">Agrupada</option>
+                    </select>
+                  </label>
+                )} 
               </div>
 
               {editing && (
@@ -554,7 +572,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                   <div
                     className="range-slider-track"
                     style={{
-                      background: `linear-gradient(to right, #e2e8f0 ${startPct}%, #667eea ${startPct}%, #764ba2 ${endPct}%, #e2e8f0 ${endPct}%)`,
+                      background: `linear-gradient(to right, #e2e8f0 ${startPct}%, #208B46 ${startPct}%, #071F3C ${endPct}%, #e2e8f0 ${endPct}%)`,
                     }}
                   />
                   <input
@@ -635,19 +653,20 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                         activeDot={{ r: 6 }}
                         connectNulls
                       />
-                      {investimentos.map((inv, index) => (
-                        <Line
-                          key={inv.codInvestimento}
-                          type="monotone"
-                          dataKey={seriesKey(inv.codInvestimento)}
-                          name={inv.descricao}
-                          stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
-                          strokeWidth={2}
-                          dot={false}
-                          activeDot={{ r: 5 }}
-                          connectNulls
-                        />
-                      ))}
+                      {transactionDisplay === 'individual' &&
+                        investimentos.map((inv, index) => (
+                          <Line
+                            key={inv.codInvestimento}
+                            type="monotone"
+                            dataKey={seriesKey(inv.codInvestimento)}
+                            name={inv.descricao}
+                            stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
+                            strokeWidth={2}
+                            dot={false}
+                            activeDot={{ r: 5 }}
+                            connectNulls
+                          />
+                        ))}
                     </LineChart>
                   </ResponsiveContainer>
                 )}

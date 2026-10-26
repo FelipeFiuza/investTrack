@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bezkoder.spring.datajpa.model.Base;
+import com.bezkoder.spring.datajpa.model.ExibicaoTransacoes;
 import com.bezkoder.spring.datajpa.model.Metrica;
 
 public class PanelUpdateDTO {
@@ -11,6 +12,7 @@ public class PanelUpdateDTO {
     private String descricao;
     private Base base;
     private Metrica metrica;
+    private ExibicaoTransacoes exibicaoTransacoes;
     private boolean filtroTransacoes;
     private List<Long> idsTransacao = new ArrayList<Long>();
 
@@ -36,6 +38,14 @@ public class PanelUpdateDTO {
 
     public void setMetrica(Metrica metrica) {
         this.metrica = metrica;
+    }
+
+    public ExibicaoTransacoes getExibicaoTransacoes() {
+        return exibicaoTransacoes;
+    }
+
+    public void setExibicaoTransacoes(ExibicaoTransacoes exibicaoTransacoes) {
+        this.exibicaoTransacoes = exibicaoTransacoes;
     }
 
     public boolean isFiltroTransacoes() {

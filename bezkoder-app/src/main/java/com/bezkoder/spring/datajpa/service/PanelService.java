@@ -30,6 +30,7 @@ import com.bezkoder.spring.datajpa.dto.PanelUpdateDTO;
 import com.bezkoder.spring.datajpa.dto.InvestimentoSerieDTO;
 import com.bezkoder.spring.datajpa.dto.PosicaoDiariaDTO;
 import com.bezkoder.spring.datajpa.model.Base;
+import com.bezkoder.spring.datajpa.model.ExibicaoTransacoes;
 import com.bezkoder.spring.datajpa.model.Metrica;
 import com.bezkoder.spring.datajpa.model.Panel;
 import com.bezkoder.spring.datajpa.model.TipoInvestimento;
@@ -111,6 +112,7 @@ public class PanelService {
         panel.setDescricao("Novo Painel");
         panel.setBase(Base.BRUTO);
         panel.setMetrica(Metrica.VALOR);
+        panel.setExibicaoTransacoes(ExibicaoTransacoes.INDIVIDUAIS);
         panel.setFiltroTransacoes(false);
         Panel saved = panelRepository.save(panel);
         int totalTransacoes = (int) transacaoRepository.countByUsuario_IdUsuario(dto.getIdUsuario());
@@ -139,6 +141,9 @@ public class PanelService {
         }
         panel.setBase(dto.getBase());
         panel.setMetrica(dto.getMetrica());
+        panel.setExibicaoTransacoes(dto.getExibicaoTransacoes() != null
+                ? dto.getExibicaoTransacoes()
+                : ExibicaoTransacoes.INDIVIDUAIS);
         panel.setFiltroTransacoes(dto.isFiltroTransacoes());
         panel.getTransacoes().clear();
         if (dto.isFiltroTransacoes()) {
@@ -218,6 +223,9 @@ public class PanelService {
         dto.setDescricao(panel.getDescricao());
         dto.setBase(panel.getBase());
         dto.setMetrica(panel.getMetrica());
+        dto.setExibicaoTransacoes(panel.getExibicaoTransacoes() != null
+                ? panel.getExibicaoTransacoes()
+                : ExibicaoTransacoes.INDIVIDUAIS);
         dto.setFiltroTransacoes(panel.isFiltroTransacoes());
         List<Long> ids = new ArrayList<Long>();
         if (panel.getTransacoes() != null) {

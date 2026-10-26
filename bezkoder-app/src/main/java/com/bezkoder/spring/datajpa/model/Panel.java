@@ -41,6 +41,10 @@ public class Panel {
     @Column(name = "metrica", nullable = false, columnDefinition = "varchar(20) not null default 'VALOR'")
     private Metrica metrica = Metrica.VALOR;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exibicao_transacoes", nullable = false, columnDefinition = "varchar(20) not null default 'INDIVIDUAIS'")
+    private ExibicaoTransacoes exibicaoTransacoes = ExibicaoTransacoes.INDIVIDUAIS;
+
     @Column(name = "filtro_transacoes", nullable = false, columnDefinition = "bit(1) not null default 0")
     private boolean filtroTransacoes = false;
 
@@ -92,6 +96,14 @@ public class Panel {
 
     public void setMetrica(Metrica metrica) {
         this.metrica = metrica;
+    }
+
+    public ExibicaoTransacoes getExibicaoTransacoes() {
+        return exibicaoTransacoes;
+    }
+
+    public void setExibicaoTransacoes(ExibicaoTransacoes exibicaoTransacoes) {
+        this.exibicaoTransacoes = exibicaoTransacoes;
     }
 
     public boolean isFiltroTransacoes() {

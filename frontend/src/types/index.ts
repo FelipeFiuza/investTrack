@@ -94,6 +94,7 @@ export interface InvestimentoSerie {
 
 export type PanelBase = 'LIQUIDO' | 'BRUTO';
 export type PanelMetrica = 'VALOR' | 'RENTABILIDADE';
+export type PanelExibicaoTransacoes = 'AGRUPADA' | 'INDIVIDUAIS';
 
 export interface Panel {
   idPanel: number;
@@ -101,6 +102,7 @@ export interface Panel {
   descricao: string;
   base: PanelBase;
   metrica: PanelMetrica;
+  exibicaoTransacoes?: PanelExibicaoTransacoes;
   filtroTransacoes: boolean;
   quantidadeTransacoes: number;
   idsTransacao: number[];
@@ -115,6 +117,7 @@ export interface PanelUpdate {
   descricao: string;
   base: PanelBase;
   metrica: PanelMetrica;
+  exibicaoTransacoes: PanelExibicaoTransacoes;
   filtroTransacoes: boolean;
   idsTransacao: number[];
 }

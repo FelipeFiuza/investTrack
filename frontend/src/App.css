@@ -1,7 +1,7 @@
 /* App.css */
 .App {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #071F3C 0%, #208B46 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -14,22 +14,22 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #071F3C 0%, #208B46 100%);
   min-height: 100vh;
 }
 
 /* Color Palette based on logo colors */
 :root {
-  --primary-color: #667eea;
-  --secondary-color: #764ba2;
-  --tertiary-color: #ae85da;
-  --accent-color: #f093fb;
-  --text-primary: #2d3748;
-  --text-secondary: #4a5568;
-  --background-light: #f7fafc;
+  --primary-color: #208B46;
+  --secondary-color: #071F3C;
+  --tertiary-color: #d7eadc;
+  --accent-color: #176b34;
+  --text-primary: #071F3C;
+  --text-secondary: #3e5568;
+  --background-light: #f3f6f4;
   --background-white: #ffffff;
   --border-color: #e2e8f0;
-  --success-color: #48bb78;
+  --success-color: #208B46;
   --error-color: #f56565;
   --warning-color: #ed8936;
 }
@@ -55,7 +55,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(32, 139, 70, 0.35);
 }
 
 .btn-secondary {
@@ -93,7 +93,7 @@ body {
 .form-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(32, 139, 70, 0.15);
 }
 
 .form-select {
@@ -109,7 +109,7 @@ body {
 .form-select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(32, 139, 70, 0.15);
 }
 
 /* Card Styles */
@@ -147,7 +147,7 @@ body {
   border: none;
   font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(32, 139, 70, 0.35);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@ body {
 
 .fab:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(32, 139, 70, 0.45);
 }
 
 /* Responsive Design */

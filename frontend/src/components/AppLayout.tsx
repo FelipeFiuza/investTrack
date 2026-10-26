@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import logo from '../assets/images/logo.png';
 import './AppLayout.css';
 
 interface AppLayoutProps {
@@ -29,7 +30,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {collapsed ? '›' : '‹'}
         </button>
         <div className="side-menu-header">
-          <h2 className="side-menu-title">InvestTrack</h2>
+          <img src={logo} alt="InvestTrack" className="side-menu-logo" />
         </div>
         <nav className="side-menu-nav">
           <Link

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usuarioApi } from '../services/api';
+import logo from '../assets/images/logo.png';
 import './LoginPage.css';
 
 const LoginPage: React.FC = () => {
@@ -36,7 +37,7 @@ const LoginPage: React.FC = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>InvestTrack</h1>
+          <img src={logo} alt="InvestTrack" className="login-logo" />
           <p>Track your investments with ease</p>
         </div>
         
