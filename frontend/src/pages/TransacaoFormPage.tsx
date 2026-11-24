@@ -152,15 +152,15 @@ const TransacaoFormPage: React.FC = () => {
       <div className="transacao-form-container">
         <div className="transacao-form-card">
           <div className="form-header">
-            <h1>{isEdit ? 'Edit Transaction' : 'Add New Transaction'}</h1>
-            <p>Record your investment transaction</p>
+            <h1>{isEdit ? 'Editar Transação' : 'Adicionar Nova Transação'}</h1>
+            <p>Registre sua transação</p>
           </div>
 
           <form onSubmit={handleSubmit} className="transacao-form">
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="dataTransacao" className="form-label">
-                  Transaction Date *
+                  Data da Transação *
                 </label>
                 <input
                   type="datetime-local"
@@ -175,7 +175,7 @@ const TransacaoFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label htmlFor="dataVencimento" className="form-label">
-                  Maturity Date
+                  Data de Vencimento
                 </label>
                 <input
                   type="datetime-local"
@@ -191,7 +191,7 @@ const TransacaoFormPage: React.FC = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="instituicao" className="form-label">
-                  Institution *
+                  Instituição *
                 </label>
                 <input
                   type="text"
@@ -207,7 +207,7 @@ const TransacaoFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label htmlFor="codInvestimento" className="form-label">
-                  Investment Type *
+                  Tipo de Investimento *
                 </label>
                 <select
                   id="codInvestimento"
@@ -217,7 +217,7 @@ const TransacaoFormPage: React.FC = () => {
                   className="form-select"
                   required
                 >
-                  <option value={0}>Select investment type</option>
+                  <option value={0}>Selecione o tipo de investimento</option>
                   {tiposInvestimento.map(tipo => (
                     <option key={tipo.codInvestimento} value={tipo.codInvestimento}>
                       {tipo.descricao}
@@ -230,7 +230,7 @@ const TransacaoFormPage: React.FC = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="tipoTransacao" className="form-label">
-                  Transaction Type *
+                  Tipo Transação *
                 </label>
                 <select
                   id="tipoTransacao"
@@ -240,8 +240,8 @@ const TransacaoFormPage: React.FC = () => {
                   className="form-select"
                   required
                 >
-                  <option value="buy">buy</option>
-                  <option value="sell">sell</option>
+                  <option value="buy">Compra</option>
+                  <option value="sell">Venda</option>
                 </select>
               </div>
             </div>
@@ -249,7 +249,7 @@ const TransacaoFormPage: React.FC = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="valor" className="form-label">
-                  Value (R$) *
+                  Valor (R$) *
                 </label>
                 <input
                   type="number"
@@ -267,7 +267,7 @@ const TransacaoFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label htmlFor="quantidade" className="form-label">
-                  Quantity *
+                  Quantidade *
                 </label>
                 <input
                   type="number"
@@ -296,7 +296,7 @@ const TransacaoFormPage: React.FC = () => {
                 onClick={handleCancel}
                 className="btn btn-secondary"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
@@ -305,11 +305,11 @@ const TransacaoFormPage: React.FC = () => {
               >
                 {loading
                   ? isEdit
-                    ? 'Updating...'
-                    : 'Creating...'
+                    ? 'Editando...'
+                    : 'Criando...'
                   : isEdit
-                    ? 'Update Transaction'
-                    : 'Create Transaction'}
+                    ? 'Editar Transação'
+                    : 'Criar Transação'}
               </button>
             </div>
           </form>

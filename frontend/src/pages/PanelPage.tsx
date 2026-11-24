@@ -69,6 +69,21 @@ const PanelList: React.FC = () => {
     }
   };
 
+  const handleDelete = async (idPanel: number) => {
+    const ok = window.confirm('Excluir este painel?');
+    if (!ok) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      await panelApi.delete(idPanel);
+      await load();
+    } catch {
+      setError('Não foi possível excluir o painel.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="panel-list-page">
       <header className="panel-list-header">
@@ -93,15 +108,36 @@ const PanelList: React.FC = () => {
                   <th>Base</th>
                   <th>Métrica</th>
                   <th>Transações</th>
+                  <th className="panel-actions-col">Editar</th>
                 </tr>
               </thead>
               <tbody>
                 {panels.map((panel) => (
-                  <tr key={panel.idPanel} onClick={() => navigate(`/panel/${panel.idPanel}`)}>
+                  <tr key={panel.idPanel}>
                     <td>{panel.descricao || 'Novo Painel'}</td>
                     <td>{BASE_LABEL[panel.base] || panel.base}</td>
                     <td>{METRICA_LABEL[panel.metrica] || panel.metrica}</td>
                     <td>{panel.quantidadeTransacoes}</td>
+                    <td className="panel-actions-col">
+                      <div className="panel-actions">
+                        <button
+                          type="button"
+                          className="panel-action-btn panel-action-edit"
+                          aria-label="Editar painel"
+                          onClick={() => navigate(`/panel/${panel.idPanel}`)}
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          type="button"
+                          className="panel-action-btn panel-action-delete"
+                          aria-label="Excluir painel"
+                          onClick={() => handleDelete(panel.idPanel)}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

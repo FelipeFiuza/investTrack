@@ -75,12 +75,12 @@ const TransacoesListPage: React.FC = () => {
     <AppLayout>
       <div className="transacoes-list-page">
         <header className="transacoes-list-header">
-          <h1>Transactions</h1>
+          <h1>Transações</h1>
           <button
             className="btn btn-primary"
             onClick={() => navigate('/transacao')}
           >
-            Add transaction
+            Adicionar transação
           </button>
         </header>
 
@@ -88,25 +88,25 @@ const TransacoesListPage: React.FC = () => {
           {loading ? (
             <div className="loading-spinner">
               <div className="spinner"></div>
-              <p>Loading transactions...</p>
+              <p>Carregando transações...</p>
             </div>
           ) : error ? (
             <p className="transacoes-list-error">{error}</p>
           ) : transacoes.length === 0 ? (
-            <p className="transacoes-list-empty">No transactions found for this user.</p>
+            <p className="transacoes-list-empty">Nenhuma transação encontrada para este usuário.</p>
           ) : (
             <div className="transacoes-table-wrapper">
               <table className="transacoes-table">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Due date</th>
-                    <th>Institution</th>
-                    <th>Type</th>
-                    <th>Buy/Sell</th>
-                    <th>Quantity</th>
-                    <th>Value</th>
-                    <th className="transacoes-actions-col">Actions</th>
+                    <th>Data</th>
+                    <th>Vencimento</th>
+                    <th>Instituição</th>
+                    <th>Tipo</th>
+                    <th>Compra/Venda</th>
+                    <th>Quantidade</th>
+                    <th>Valor</th>
+                    <th className="transacoes-actions-col">Editar</th>
                   </tr>
                 </thead>
                 <tbody>

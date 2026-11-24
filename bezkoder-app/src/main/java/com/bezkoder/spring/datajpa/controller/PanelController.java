@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -89,6 +90,19 @@ public class PanelController {
         } catch (Exception e) {
             log.error("Falha ao atualizar panel. id={}", id, e);
             return new ResponseEntity<PanelDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") Long id) {
+        try {
+            if (!panelService.delete(id)) {
+                return new ResponseEntity<HttpStatus>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            log.error("Falha ao excluir panel. id={}", id, e);
+            return new ResponseEntity<HttpStatus>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

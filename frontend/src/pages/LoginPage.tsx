@@ -38,7 +38,7 @@ const LoginPage: React.FC = () => {
       <div className="login-card">
         <div className="login-header">
           <img src={logo} alt="InvestTrack" className="login-logo" />
-          <p>Track your investments with ease</p>
+          <p>Acompanhe seus investimentos com facilidade</p>
         </div>
         
         <form onSubmit={handleSubmit} className="login-form">
@@ -52,14 +52,14 @@ const LoginPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="form-input"
-              placeholder="Enter your email"
+              placeholder="Insira seu email"
               required
             />
           </div>
           
           <div className="form-group">
             <label htmlFor="password" className="form-label">
-              Password
+              Senha
             </label>
             <input
               type="password"
@@ -67,7 +67,7 @@ const LoginPage: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="form-input"
-              placeholder="Enter your password"
+              placeholder="Insira sua senha"
               required
             />
           </div>
@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
             className="btn btn-primary login-button"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
         
@@ -97,12 +97,12 @@ const LoginPage: React.FC = () => {
             className="btn btn-secondary"
             style={{ width: '100%', marginTop: '16px' }}
           >
-            Quick Demo Login (Skip Validation)
+            Login de demonstração (Sem necessidade de registro)
           </button>
         </div>
         
         <div className="login-footer">
-          <p>New to InvestTrack? Just sign in to create your account!</p>
+          <p>Não tem conta? Crie aqui!</p>
         </div>
       </div>
     </div>

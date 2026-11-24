@@ -62,7 +62,7 @@ const UploadPage: React.FC = () => {
 
     try {
       if (!file.name.toLowerCase().endsWith('.xlsx')) {
-        throw new Error('Please select a .xlsx file exported by B3.');
+        throw new Error('Por favor selecione um arquivo .xlsx exportado pela B3.');
       }
 
       const buffer = await file.arrayBuffer();
@@ -143,7 +143,7 @@ const UploadPage: React.FC = () => {
       <div className="upload-page">
         <header className="upload-header">
           <h1>Upload</h1>
-          <p>Import stock trades from a B3 .xlsx statement.</p>
+          <p>Importe transações de ações a partir de um arquivo .xlsx exportado pela B3</p>
         </header>
 
         <section className="upload-card">
@@ -156,10 +156,10 @@ const UploadPage: React.FC = () => {
               disabled={parsing || saving}
             />
             <span className="upload-dropzone-title">
-              {parsing ? 'Reading file...' : 'Choose a B3 .xlsx file'}
+              {parsing ? 'Lendo arquivo...' : 'Selecione um arquivo .xlsx exportado pela B3'}
             </span>
             <span className="upload-dropzone-hint">
-              {fileName || 'Only rows with Movimentação = Transferência - Liquidação are imported.'}
+              {fileName || 'Serão importadas transações de ações, pagamento de dividendos e juros sobre capital próprio.'}
             </span>
           </label>
         </section>
@@ -170,15 +170,15 @@ const UploadPage: React.FC = () => {
           <section className="upload-preview">
             <div className="upload-preview-header">
               <div>
-                <h2>Confirm transactions</h2>
+                <h2>Confirmar transações</h2>
                 <p>
-                  {selectedRows.length} of {rows.length} selected
-                  {ignoredCount > 0 ? ` · ${ignoredCount} other rows ignored` : ''}
+                  {selectedRows.length} de {rows.length} selecionadas
+                  {ignoredCount > 0 ? ` · ${ignoredCount} outras linhas ignoradas` : ''}
                 </p>
               </div>
               <div className="upload-preview-actions">
                 <button type="button" className="btn btn-secondary" onClick={resetPreview} disabled={saving}>
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="button"
@@ -186,7 +186,7 @@ const UploadPage: React.FC = () => {
                   onClick={handleConfirm}
                   disabled={saving || selectedRows.length === 0}
                 >
-                  {saving ? 'Saving...' : `Confirm ${selectedRows.length} transaction${selectedRows.length === 1 ? '' : 's'}`}
+                  {saving ? 'Salvando...' : `Confirmar ${selectedRows.length} transação${selectedRows.length === 1 ? '' : 's'}`}
                 </button>
               </div>
             </div>

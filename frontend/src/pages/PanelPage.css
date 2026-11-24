@@ -509,10 +509,6 @@
   letter-spacing: 0.02em;
 }
 
-.panel-list-table tbody tr {
-  cursor: pointer;
-}
-
 .panel-list-table tbody tr:hover {
   background: var(--background-light);
 }
@@ -520,6 +516,40 @@
 .panel-list-table td {
   color: var(--text-primary);
   font-size: 15px;
+}
+
+.panel-actions-col {
+  text-align: right;
+  width: 120px;
+  white-space: nowrap;
+}
+
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.panel-action-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.05s ease;
+}
+
+.panel-action-btn:hover {
+  background: var(--background-light);
+}
+
+.panel-action-edit:hover {
+  color: var(--primary-color);
+}
+
+.panel-action-delete:hover {
+  color: var(--error-color);
 }
 
 .panel-list-error,

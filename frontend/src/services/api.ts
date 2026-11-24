@@ -62,6 +62,7 @@ export const panelApi = {
   getById: (id: number) => api.get<Panel>(`/panel/${id}`),
   create: (data: PanelCreate) => api.post<Panel>('/panel', data),
   update: (id: number, data: PanelUpdate) => api.put<Panel>(`/panel/${id}`, data),
+  delete: (id: number) => api.delete(`/panel/${id}`),
   getPosicoes: (idUsuario: number, inicio: string, fim: string, idsExcluidos?: number[]) =>
     api.get<PanelPosicaoResponse>('/panel/posicoes', {
       params: {

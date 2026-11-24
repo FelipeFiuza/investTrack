@@ -43,7 +43,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             to="/panel"
             className={`side-menu-item ${location.pathname.startsWith('/panel') ? 'active' : ''}`}
           >
-            Panel
+            Painéis
           </Link>
           <Link
             to="/transactions"

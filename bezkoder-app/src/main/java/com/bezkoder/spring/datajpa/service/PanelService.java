@@ -155,6 +155,26 @@ public class PanelService {
         return toDto(saved, totalTransacoes);
     }
 
+    @Transactional
+    public boolean delete(Long id) {
+        Panel panel = panelRepository.findById(id).orElse(null);
+        if (panel == null) {
+            return false;
+        }
+        panel.getTransacoes().clear();
+        panelRepository.saveAndFlush(panel);
+        clearDashboardReferences(id);
+        panelRepository.delete(panel);
+        return true;
+    }
+
+    private void clearDashboardReferences(Long idPanel) {
+        jdbcTemplate.update("UPDATE dashboard SET id_panel_esquerda_superior = NULL WHERE id_panel_esquerda_superior = ?", idPanel);
+        jdbcTemplate.update("UPDATE dashboard SET id_panel_direita_superior = NULL WHERE id_panel_direita_superior = ?", idPanel);
+        jdbcTemplate.update("UPDATE dashboard SET id_panel_esquerda_inferior = NULL WHERE id_panel_esquerda_inferior = ?", idPanel);
+        jdbcTemplate.update("UPDATE dashboard SET id_panel_direita_inferior = NULL WHERE id_panel_direita_inferior = ?", idPanel);
+    }
+
     public PanelPosicaoResponse getPosicoes(Long idUsuario, LocalDate inicio, LocalDate fim,
             List<Long> idsExcluidos) {
         if (fim == null) {
