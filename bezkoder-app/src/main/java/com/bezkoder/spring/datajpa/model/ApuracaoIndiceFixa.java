@@ -28,7 +28,7 @@ public class ApuracaoIndiceFixa {
     @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
     private Indice indice;
 
-    @Column(name = "valor_fechamento")
+    @Column(name = "valor_fechamento", precision = 19, scale = 8)
     private BigDecimal valorFechamento;
 
     public ApuracaoIndiceFixa() {

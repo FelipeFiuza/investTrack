@@ -14,4 +14,5 @@ public interface IndiceRepository extends JpaRepository<Indice, Long> {
     List<Indice> findByCodIndice(Long codIndice);
     boolean existsByDescricao(String descricao);
     Indice findByDescricao(String descricao);
+    List<Indice> findByDescricaoAndTipoIndice(String descricao, String tipoIndice);
 }

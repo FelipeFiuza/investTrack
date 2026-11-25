@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -21,7 +21,7 @@ public class TipoInvestimento {
     @Column(name = "cod_indice", length = 20)
     private Long codIndice;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "cod_indice", insertable = false, updatable = false)
     private Indice indice;
 

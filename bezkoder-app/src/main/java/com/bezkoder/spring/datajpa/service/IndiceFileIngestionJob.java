@@ -51,8 +51,8 @@ public class IndiceFileIngestionJob implements CommandLineRunner {
         "numero_distribuicao = VALUES(numero_distribuicao)";
 
     private static final List<String> FILE_PATHS = Arrays.asList(
-        // "data/COTAHIST_A2021.TXT",
-        // "data/COTAHIST_A2022.TXT",
+        "data/COTAHIST_A2021.TXT",
+        "data/COTAHIST_A2022.TXT",
         "data/COTAHIST_A2023.TXT",
         "data/COTAHIST_A2024.TXT",
         "data/COTAHIST_A2025.TXT",

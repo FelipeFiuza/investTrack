@@ -50,6 +50,60 @@
   margin-bottom: 20px;
 }
 
+.form-group-span {
+  grid-column: 1 / -1;
+}
+
+.field-hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.field-hint-error {
+  color: #c53030;
+}
+
+.acao-search {
+  position: relative;
+}
+
+.acao-suggestions {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(7, 31, 60, 0.12);
+}
+
+.acao-suggestion {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.acao-suggestion.active,
+.acao-suggestion:hover {
+  background: rgba(32, 139, 70, 0.12);
+}
+
+.acao-suggestion-muted {
+  cursor: default;
+  color: var(--text-secondary);
+}
+
+.acao-suggestion-muted:hover {
+  background: transparent;
+}
+
 .form-actions {
   display: flex;
   gap: 16px;

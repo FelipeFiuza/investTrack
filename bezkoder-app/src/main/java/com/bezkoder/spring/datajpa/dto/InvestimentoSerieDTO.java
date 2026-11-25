@@ -7,15 +7,18 @@ public class InvestimentoSerieDTO {
 
     private Long codInvestimento;
     private String descricao;
-    private List<PosicaoDiariaDTO> posicoes = new ArrayList<PosicaoDiariaDTO>();
+    private List<TransacaoSerieDTO> transacoes = new ArrayList<TransacaoSerieDTO>();
+    private List<CotacaoDiaDTO> cotacoes = new ArrayList<CotacaoDiaDTO>();
 
     public InvestimentoSerieDTO() {
     }
 
-    public InvestimentoSerieDTO(Long codInvestimento, String descricao, List<PosicaoDiariaDTO> posicoes) {
+    public InvestimentoSerieDTO(Long codInvestimento, String descricao, List<TransacaoSerieDTO> transacoes,
+            List<CotacaoDiaDTO> cotacoes) {
         this.codInvestimento = codInvestimento;
         this.descricao = descricao;
-        this.posicoes = posicoes;
+        this.transacoes = transacoes;
+        this.cotacoes = cotacoes;
     }
 
     public Long getCodInvestimento() {
@@ -34,11 +37,19 @@ public class InvestimentoSerieDTO {
         this.descricao = descricao;
     }
 
-    public List<PosicaoDiariaDTO> getPosicoes() {
-        return posicoes;
+    public List<TransacaoSerieDTO> getTransacoes() {
+        return transacoes;
     }
 
-    public void setPosicoes(List<PosicaoDiariaDTO> posicoes) {
-        this.posicoes = posicoes;
+    public void setTransacoes(List<TransacaoSerieDTO> transacoes) {
+        this.transacoes = transacoes;
+    }
+
+    public List<CotacaoDiaDTO> getCotacoes() {
+        return cotacoes;
+    }
+
+    public void setCotacoes(List<CotacaoDiaDTO> cotacoes) {
+        this.cotacoes = cotacoes;
     }
 }

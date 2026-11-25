@@ -96,9 +96,9 @@ public class TransacaoImportService {
             indice = indiceRepository.save(indice);
         }
 
-        TipoInvestimento existing = tipoInvestimentoRepository.findByIndice(indice);
-        if (existing != null) {
-            return existing;
+        List<TipoInvestimento> existentes = tipoInvestimentoRepository.findByIndice(indice);
+        if (existentes != null && !existentes.isEmpty()) {
+            return existentes.get(0);
         }
 
         TipoInvestimento tipo = new TipoInvestimento();

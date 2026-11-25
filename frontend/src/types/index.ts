@@ -69,27 +69,26 @@ export interface Indice {
   tipoIndice: string;
 }
 
-export interface PosicaoDiaria {
+export interface TransacaoSerie {
+  idTransacao?: number | null;
+  dataTransacao: string;
+  tipoTransacao?: string | null;
+  quantidade?: number | null;
+  valorTotal?: number | null;
+  valorUnitario?: number | null;
+  taxasImpostos?: number | null;
+}
+
+export interface CotacaoDia {
   day: string;
-  currentQty?: number | null;
-  currentAverageCost?: number | null;
-  boughtQty?: number | null;
-  boughtPrice?: number | null;
-  boughtTaxes?: number | null;
-  soldQty?: number | null;
-  soldPrice?: number | null;
-  soldTaxes?: number | null;
   valorFechamento?: number | null;
-  grossTotalAmount?: number | null;
-  netTotalAmount?: number | null;
-  grossVariation?: number | null;
-  netVariation?: number | null;
 }
 
 export interface InvestimentoSerie {
   codInvestimento: number;
   descricao: string;
-  posicoes: PosicaoDiaria[];
+  transacoes: TransacaoSerie[];
+  cotacoes: CotacaoDia[];
 }
 
 export type PanelBase = 'LIQUIDO' | 'BRUTO';

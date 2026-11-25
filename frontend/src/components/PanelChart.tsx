@@ -11,7 +11,8 @@ import {
   YAxis,
 } from 'recharts';
 import { panelApi, transacaoApi } from '../services/api';
-import { InvestimentoSerie, Panel, PanelBase, PanelExibicaoTransacoes, PanelMetrica, PanelPosicaoResponse, PosicaoDiaria, Transacao } from '../types';
+import { InvestimentoSerie, Panel, PanelBase, PanelExibicaoTransacoes, PanelMetrica, PanelPosicaoResponse, Transacao } from '../types';
+import { CHAVE_TOTAL, DadoGrafico, chaveSerie, montarGrafico } from '../utils/posicaoSerie';
 import SelecionarTransacoesModal from './SelecionarTransacoesModal';
 import {
   allTransactionIds,
@@ -34,7 +35,6 @@ type TransactionDisplay = 'grouped' | 'individual';
 
 const PERIOD_MONTHS_MAX = 60;
 const PERIOD_MONTHS_DEFAULT = 24;
-const TOTAL_KEY = 'total';
 const SERIES_COLORS = [
   '#208B46',
   '#48bb78',
@@ -103,132 +103,34 @@ const formatMonthLabel = (date: Date): string => {
   return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
 };
 
-const seriesKey = (codInvestimento: number): string => `inv_${codInvestimento}`;
-
-const toNumber = (value?: number | null): number | null => {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) {
-    return null;
+const ultimoTotal = (points: DadoGrafico[]): DadoGrafico | undefined => {
+  for (let i = points.length - 1; i >= 0; i -= 1) {
+    if (typeof points[i].total === 'number') return points[i];
   }
-  return Number(value);
-};
-
-const amountOf = (pos: PosicaoDiaria, basis: AmountBasis): number | null => {
-  return toNumber(basis === 'gross' ? pos.grossTotalAmount : pos.netTotalAmount);
-};
-
-const variationOf = (pos: PosicaoDiaria, basis: AmountBasis): number | null => {
-  return toNumber(basis === 'gross' ? pos.grossVariation : pos.netVariation);
-};
-
-/** Multiplier 1.05 → 0.05 (5%). Same idea as variation relative to 1. */
-const variationToRate = (variation: number | null): number | null => {
-  if (variation === null) return null;
-  return variation - 1;
-};
-
-const costBasisOf = (pos: PosicaoDiaria): number => {
-  const qty = toNumber(pos.currentQty) || 0;
-  const avg = toNumber(pos.currentAverageCost) || 0;
-  return qty * avg;
-};
-
-interface ChartPoint {
-  day: string;
-  [key: string]: string | number | null;
-}
-
-const buildChartData = (
-  investimentos: InvestimentoSerie[],
-  basis: AmountBasis,
-  metric: MetricKind
-): ChartPoint[] => {
-  const days = new Set<string>();
-  const byInvDay = new Map<number, Map<string, PosicaoDiaria>>();
-
-  investimentos.forEach((inv) => {
-    const dayMap = new Map<string, PosicaoDiaria>();
-    inv.posicoes.forEach((pos) => {
-      if (!pos.day) return;
-      days.add(pos.day);
-      dayMap.set(pos.day, pos);
-    });
-    byInvDay.set(inv.codInvestimento, dayMap);
-  });
-
-  const sortedDays = Array.from(days).sort();
-  const lastPos = new Map<number, PosicaoDiaria>();
-
-  return sortedDays.map((day) => {
-    const point: ChartPoint = { day };
-    let totalAmount = 0;
-    let totalCost = 0;
-    let hasTotal = false;
-
-    investimentos.forEach((inv) => {
-      const row = byInvDay.get(inv.codInvestimento)?.get(day);
-      if (row) {
-        lastPos.set(inv.codInvestimento, row);
-      }
-      const pos = lastPos.get(inv.codInvestimento);
-      if (!pos) return;
-
-      const key = seriesKey(inv.codInvestimento);
-      if (metric === 'value') {
-        const value = amountOf(pos, basis);
-        point[key] = value;
-        if (value !== null) {
-          totalAmount += value;
-          hasTotal = true;
-        }
-      } else {
-        point[key] = variationToRate(variationOf(pos, basis));
-        const amount = amountOf(pos, basis);
-        const cost = costBasisOf(pos);
-        if (amount !== null && cost > 0) {
-          totalAmount += amount;
-          totalCost += cost;
-          hasTotal = true;
-        }
-      }
-    });
-
-    if (metric === 'value') {
-      point[TOTAL_KEY] = hasTotal ? totalAmount : null;
-    } else {
-      point[TOTAL_KEY] = totalCost > 0 ? totalAmount / totalCost - 1 : null;
-    }
-
-    return point;
-  });
+  return undefined;
 };
 
 const latestStats = (
   investimentos: InvestimentoSerie[],
-  basis: AmountBasis
+  basis: AmountBasis,
+  inicio: string,
+  fim: string
 ): { totalValue: number | null; returnRate: number | null; prevValue: number | null } => {
-  const points = buildChartData(investimentos, basis, 'value');
-  const returnPoints = buildChartData(investimentos, basis, 'return');
-  if (points.length === 0) {
+  const points = montarGrafico(investimentos, basis, 'value', inicio, fim).dados;
+  const returnPoints = montarGrafico(investimentos, basis, 'return', inicio, fim).dados;
+  const last = ultimoTotal(points);
+  const lastReturn = ultimoTotal(returnPoints);
+  if (!last) {
     return { totalValue: null, returnRate: null, prevValue: null };
   }
 
-  const last = points[points.length - 1];
-  const lastValue = typeof last[TOTAL_KEY] === 'number' ? (last[TOTAL_KEY] as number) : null;
-  const lastReturnPoint = returnPoints[returnPoints.length - 1];
-  const returnRate =
-    lastReturnPoint && typeof lastReturnPoint[TOTAL_KEY] === 'number'
-      ? (lastReturnPoint[TOTAL_KEY] as number)
-      : null;
-
-  const lastDay = last.day;
-  const target = new Date(`${lastDay}T00:00:00`);
+  const lastValue = typeof last.total === 'number' ? last.total : null;
+  const returnRate = lastReturn && typeof lastReturn.total === 'number' ? lastReturn.total : null;
+  const target = new Date(last.ts);
   target.setDate(target.getDate() - 30);
   const targetIso = toISODate(target);
-  const prev =
-    points.filter((p) => p.day <= targetIso).pop() ||
-    (points.length > 1 ? points[0] : undefined);
-  const prevValue =
-    prev && typeof prev[TOTAL_KEY] === 'number' ? (prev[TOTAL_KEY] as number) : null;
+  const prev = points.filter((p) => p.day <= targetIso && typeof p.total === 'number').pop();
+  const prevValue = prev && typeof prev.total === 'number' ? prev.total : null;
 
   return { totalValue: lastValue, returnRate, prevValue };
 };
@@ -377,12 +279,29 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
 
   const investimentos = useMemo(() => data?.investimentos || [], [data]);
 
-  const chartData = useMemo(
-    () => buildChartData(investimentos, basis, metric),
-    [investimentos, basis, metric]
+  const grafico = useMemo(
+    () => montarGrafico(investimentos, basis, metric, inicio, fim),
+    [investimentos, basis, metric, inicio, fim]
   );
+  const chartData = grafico.dados;
+  const seriesVisiveis = useMemo(() => {
+    const ativos = new Set(grafico.codigos);
+    return investimentos.filter((inv) => ativos.has(inv.codInvestimento));
+  }, [grafico.codigos, investimentos]);
 
-  const stats = useMemo(() => latestStats(investimentos, basis), [investimentos, basis]);
+  const periodStart = useMemo(() => {
+    const [year, month, date] = inicio.split('-').map(Number);
+    return new Date(year, (month || 1) - 1, date || 1).getTime();
+  }, [inicio]);
+  const periodEnd = useMemo(() => {
+    const [year, month, date] = fim.split('-').map(Number);
+    return new Date(year, (month || 1) - 1, date || 1).getTime();
+  }, [fim]);
+
+  const stats = useMemo(
+    () => latestStats(investimentos, basis, inicio, fim),
+    [investimentos, basis, inicio, fim]
+  );
 
   const valueChange =
     stats.totalValue !== null && stats.prevValue && stats.prevValue !== 0
@@ -465,9 +384,8 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
     return currencyFmt.format(value/100);
   };
 
-  const formatXAxis = (day: string) => {
-    const date = new Date(`${day}T00:00:00`);
-    return date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+  const formatXAxis = (ts: number) => {
+    return new Date(ts).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
   };
 
   const editing = mode === 'edit';
@@ -609,7 +527,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                   <div className="empty-chart">
                     <p>{error}</p>
                   </div>
-                ) : chartData.length === 0 ? (
+                ) : grafico.codigos.length === 0 ? (
                   <div className="empty-chart">
                     <p>Nenhum investimento ativo no período selecionado.</p>
                   </div>
@@ -618,7 +536,10 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                     <LineChart data={chartData} margin={{ top: 8, right: 12, left: 8, bottom: 8 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis
-                        dataKey="day"
+                        dataKey="ts"
+                        type="number"
+                        scale="time"
+                        domain={[periodStart, periodEnd]}
                         stroke="#4a5568"
                         fontSize={12}
                         minTickGap={32}
@@ -632,9 +553,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                       />
                       <Tooltip
                         formatter={(value: number, name: string) => [formatTooltip(value), name]}
-                        labelFormatter={(label) =>
-                          new Date(`${label}T00:00:00`).toLocaleDateString('pt-BR')
-                        }
+                        labelFormatter={(label) => new Date(Number(label)).toLocaleDateString('pt-BR')}
                         contentStyle={{
                           backgroundColor: 'white',
                           border: '1px solid #e2e8f0',
@@ -645,26 +564,26 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                       <Legend wrapperStyle={{ fontSize: 11, lineHeight: '14px' }} iconSize={8} />
                       <Line
                         type="monotone"
-                        dataKey={TOTAL_KEY}
+                        dataKey={CHAVE_TOTAL}
                         name="Carteira"
                         stroke="#2d3748"
                         strokeWidth={3}
                         dot={false}
                         activeDot={{ r: 6 }}
-                        connectNulls
+                        connectNulls={false}
                       />
                       {transactionDisplay === 'individual' &&
-                        investimentos.map((inv, index) => (
+                        seriesVisiveis.map((inv, index) => (
                           <Line
                             key={inv.codInvestimento}
                             type="monotone"
-                            dataKey={seriesKey(inv.codInvestimento)}
+                            dataKey={chaveSerie(inv.codInvestimento)}
                             name={inv.descricao}
                             stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
                             strokeWidth={2}
                             dot={false}
                             activeDot={{ r: 5 }}
-                            connectNulls
+                            connectNulls={false}
                           />
                         ))}
                     </LineChart>
@@ -698,7 +617,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                 <div className="stat-icon">💰</div>
                 <div className="stat-content">
                   <h3>Investimentos</h3>
-                  <p className="stat-value">{investimentos.length}</p>
+                  <p className="stat-value">{seriesVisiveis.length}</p>
                   <p className="stat-change">Ativos no período</p>
                 </div>
               </div>
@@ -721,7 +640,7 @@ const PanelChart: React.FC<PanelChartProps> = ({ panelId, mode, embedded = false
                         : 'negative'
                     }`}
                   >
-                    Sobre o custo médio da carteira
+                    Vendas e valor atual sobre o investido no período
                   </p>
                 </div>
               </div>
