@@ -6,7 +6,7 @@ Aplicação para acompanhar uma **carteira de investimentos** focada em **açõe
 
 - Consolida compras e vendas da carteira (digitadas ou importadas do extrato B3).
 - Cruza cada ativo com a série de **preços de fechamento** (ações via arquivos COTAHIST; renda fixa via tabela própria).
-- Calcula, dia a dia, quantidade, custo médio, valor de mercado e variação — bruta ou líquida de taxas.
+- Calcula, no gráfico, quantidade, custo médio, valor de mercado e variação — bruta ou líquida de taxas.
 - Exibe o resultado em um panel com período, métrica e transações configuráveis.
 
 Não é um home broker: o objetivo é **acompanhar o que você já possui**, não executar ordens.
@@ -27,13 +27,13 @@ O sistema é um monolito de dados com frontend desacoplado. Três camadas se com
 │  API (Spring Boot 2.2 · Java 8 · JPA)                       │
 │  Controllers → Services → Repositories                      │
 │  http://localhost:6868                                      │
-└──────────────┬──────────────────────────────┬───────────────┘
-               │ JDBC                         │ CALL get_posicao_diaria
-               ▼                              ▼
-┌──────────────────────────┐    ┌─────────────────────────────┐
-│  MySQL 5.7               │    │  Stored procedure           │
-│  transacao               │    │  posição diária por ativo   │
-│  tipo_investimento       │    └─────────────────────────────┘
+└──────────────┬──────────────────────────────────────────────┘
+               │ JDBC
+               ▼
+┌──────────────────────────┐
+│  MySQL 5.7               │
+│  transacao               │
+│  tipo_investimento       │
 │  indice                  │
 │  apuracao_indice         │  ← fechamentos B3 (COTAHIST)
 │  apuracao_indice_fixa    │  ← curva de renda fixa
@@ -44,10 +44,9 @@ O sistema é um monolito de dados com frontend desacoplado. Três camadas se com
 
 | Camada | Responsabilidade |
 | --- | --- |
-| **Frontend** | Interface, rotas, importação B3 no browser, filtros do gráfico e formatação em BRL. Não calcula preço de mercado. |
-| **API** | CRUD de usuários, transações, índices e apurações. Importa lote de trades. Expõe a série do panel. |
+| **Frontend** | Interface, rotas, importação B3 no browser e o cálculo do gráfico (quantidade, custo médio, valor e rentabilidade). |
+| **API** | CRUD de usuários, transações, índices e apurações. Importa lote de trades. Entrega transações e fechamentos do panel, sem calcular a série. |
 | **Ingestão COTAHIST** | No startup, lê arquivos `data/COTAHIST_A*.TXT` e grava abertura/máximo/mínimo/fechamento em `apuracao_indice`. |
-| **Procedure `get_posicao_diaria`** | Recalcula a posição de um ativo no intervalo: aplica transações em ordem, busca o fechamento do dia (ações ou fallback de renda fixa) e devolve valor bruto/líquido e variação. |
 
 O frontend aponta para `http://localhost:6868/api` (`src/services/api.ts`). A API e o MySQL sobem juntos com Docker Compose na raiz do repositório.
 
@@ -66,15 +65,16 @@ Usuario 1──* Transacao *──1 TipoInvestimento ──1 Indice
 - **ApuracaoIndiceFixa** — série de fechamento para renda fixa, usada quando não há cotação B3.
 - **Transacao** — compra (`buy`) ou venda (`sell`), com data, instituição, quantidade, valor unitário/total e taxas.
 
-A procedure marca a carteira assim:
+O gráfico marca a carteira no browser (`src/utils/posicaoSerie.ts`), com os fechamentos e as transações que a API entrega:
 
 1. Processa transações até o fim do período (compras sobem quantidade e custo médio; vendas só baixam quantidade).
 2. Para cada dia, lê `valor_fechamento` em `apuracao_indice`; se não houver, usa `apuracao_indice_fixa`.
-3. `gross_total_amount = fechamento × quantidade`
-4. `net_total_amount = bruto − taxas acumuladas`
-5. Variação bruta/líquida em relação ao custo médio.
+3. No dia de uma compra, o fechamento usado é o custo médio — inclusive na primeira compra.
+4. Valor bruto = fechamento × quantidade. Valor líquido = bruto − taxas acumuladas.
+5. Cada ativo mede a rentabilidade contra o `valor_fechamento` da data inicial, quando já havia quantidade. Se o período começa zerado, a base é o preço da primeira compra. O acumulado da carteira é (vendas do período + valor atual) / (valor da carteira no início + compras do período) − 1.
+6. Venda integral encerra a linha no valor recebido. Os dias seguintes ficam sem ponto, em vez de descer a zero.
 
-Transações anteriores ao início do gráfico entram no saldo de abertura, mas não geram pontos.
+Transações anteriores ao início do gráfico entram no saldo de abertura, mas não geram pontos. O eixo horizontal permanece no período escolhido.
 
 ## Frontend: telas e personalização
 
@@ -92,7 +92,7 @@ SPA Create React App. Rotas em `src/App.tsx`, layout com menu em `AppLayout`.
 
 1. `panelApi.get` carrega a configuração salva (base, métrica e transações). Se o usuário ainda não tem panel, a API cria um com base líquida e métrica de valor.
 2. `panelApi.getPosicoes(usuario, inicio, fim, idsExcluidos)` busca as séries.
-3. `buildChartData` agrega as posições diárias no cliente (carteira + cada ativo).
+3. `montarGrafico` (`utils/posicaoSerie.ts`) calcula a posição no cliente e desenha a carteira e cada ativo no período configurado.
 4. O usuário escolhe **Base** (bruto/líquido), **Métrica** (valor/rentabilidade) e o intervalo (até 60 meses). Base e métrica são gravadas com `panelApi.update`.
 5. **Selecionar transações** abre um popup: desmarcar uma compra também desmarca vendas do mesmo ativo que deixariam saldo negativo (`utils/transactionSelection.ts`). A seleção é persistida no panel; os IDs excluídos voltam na query do gráfico.
 
@@ -131,6 +131,7 @@ frontend/src/
 ├── types/index.ts
 └── utils/
     ├── b3Import.ts
+    ├── posicaoSerie.ts     # cálculo do gráfico
     └── transactionSelection.ts
 ```
 
@@ -141,7 +142,7 @@ Base: `http://localhost:6868/api`. CORS liberado para o frontend.
 | Recurso | Uso |
 | --- | --- |
 | `GET /panel` e `PUT /panel/{id}` | Configuração do panel: base, métrica e transações selecionadas. `GET` recebe `idUsuario` e cria o registro se ainda não existir. |
-| `GET /panel/posicoes` | Série do gráfico. Query: `idUsuario`, `inicio`, `fim`, `idsExcluidos` (IDs separados por vírgula). |
+| `GET /panel/posicoes` | Transações até o fim do período e fechamentos do intervalo, por ativo. Query: `idUsuario`, `inicio`, `fim`, `idsExcluidos` (IDs separados por vírgula). |
 | `GET/POST/PUT/DELETE /transacoes` | Movimentações da carteira. |
 | `POST /transacoes/import` | Lote vindo do upload B3 (ticker → tipo de investimento). |
 | `GET /apuracoes-indice` | Fechamentos (e demais OHLC) por período ou por índice. |
@@ -149,7 +150,7 @@ Base: `http://localhost:6868/api`. CORS liberado para o frontend.
 | `GET /tipos-investimento` | Ativos da carteira (ações e renda fixa). |
 | `GET/POST /usuarios` | Usuário da sessão. |
 
-A ingestão COTAHIST (`IndiceFileIngestionJob`) roda na subida da API e preenche `apuracao_indice`. Renda fixa permanece em `apuracao_indice_fixa` para o fallback da procedure.
+A ingestão COTAHIST (`IndiceFileIngestionJob`) roda na subida da API e preenche `apuracao_indice`. Renda fixa permanece em `apuracao_indice_fixa` e é usada quando não há fechamento B3.
 
 ## Como rodar
 
@@ -184,6 +185,6 @@ Requisitos: Node.js 16+.
 ## Stack
 
 - **UI:** React 18, TypeScript, React Router 6, Recharts, Axios, SheetJS (`xlsx`)
-- **API:** Spring Boot, Spring Data JPA, stored procedure MySQL
+- **API:** Spring Boot, Spring Data JPA, MySQL
 - **Dados de mercado:** COTAHIST (B3) + apurações de renda fixa
 - **Infra:** Docker Compose (MySQL 5.7 + app Java)

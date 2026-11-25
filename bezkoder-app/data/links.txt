@@ -19,8 +19,24 @@ mv COTAHIST_A2025.ZIP bezkoder-app/data
 cd bezkoder-app/data
 unzip COTAHIST_A2025.ZIP
 
+limpeza da imagem (bateu 50gb, caiu pra 20) para evitar que cresça use:
+sudo docker system prune -a --volumes
+
+se deixou crescer, será necessário compactar novamente
+diskpart
+select vdisk file="C:\Users\Inspiron7559\AppData\Local\wsl\{ffbec952-00e1-4f3b-9f8f-d924ef356a2c}\ext4.vhdx"
+attach vdisk readonly
+compact vdisk
+detach vdisk
+exit
+
+
 Magazine Luiza (MGLU3): Anunciou agrupamento na proporção de 10 para 1 em 2024.
 IRB Brasil (IRBR3): Aprovou grupamento de 30 para 1.
 Aeris (AERI3): Realizou grupamento de 20 para 1.
 Méliuz (CASH3): Realizou grupamento após desvalorização.
 Recrusul (RCSL3/RCSL4): Citada em calendários de agrupamentos
+
+-alterar unidade para centavos
+-panel and dashboard
+-ajustes da formula para zerar apos venda
